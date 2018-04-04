@@ -1,8 +1,8 @@
-# Registration Reference Number Generation tooling (rrn-gen)
+# Reference Number Generation tooling (rrn-gen)
 
 ## Summary
 
-Tooling and specification to support the generation of Food Business Establishment Registration Reference Numbers
+Tooling and specification to support the generation of Reference Numbers in particular for Food Business Establishment Registration. 
 
 This is currently in the Alpha phase.  We use the alpha phase to: build prototypes of our services, test with users and in this case third-party suppliers and to demonstrate services are technically possible.
 
