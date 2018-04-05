@@ -1,7 +1,7 @@
 /*******************************************************************************
- * File:        RNException.java
+ * File:        RNTest.java
  * Created by:  Stuart Williams (skw@epimorphics.com)
- * Created on:  5 Apr 2018
+ * Created on:  4 Apr 2018
  *
  * Copyright (C) 2018 Food Standards Agency
  *
@@ -23,41 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- ******************************************************************************/
+ *******************************************************************************/
 package com.epimorphics.fsa.rn;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 /**
- * @author skw
- *
+ * Unit test for simple App.
  */
-public class RNException extends Exception
+public class RNTest 
+    extends TestCase
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3337530546179420650L;
-	
-	/**
-	 * 
-	 */
-	public RNException() {
-		super();
-	}
-	
-	public RNException(String msg) {
-		super(msg);
-	}
-	
-	public RNException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
-	
-	public RNException(Throwable cause) {
-		super(cause);
-	}
-	
-	public RNException(String msg, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(msg,cause, enableSuppression, writableStackTrace);
-	}
+    /**
+     * Create the test case
+     *
+     * @param testName name of the test case
+     */
+    public RNTest( String testName )
+    {
+        super( testName );
+    }
+
+    /**
+     * @return the suite of tests being tested
+     */
+    public static Test suite()
+    {
+        return new TestSuite( RNTest.class );
+    }
+
+    /**
+     * Rigourous Test :-)
+     */
+    public void testApp()
+    {
+        assertTrue( true );
+    }
 }
- 
