@@ -29,10 +29,6 @@ package com.epimorphics.fsa.rn;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-/**
- * @author skw
- *
- */
 public class Transposition {
 	static int i_base  = 33;
 	static int i_prime = 1087; 
@@ -47,8 +43,7 @@ public class Transposition {
 	 */
 	public static void main(String[] args) {
 
-		initWeights();
-		
+		initWeights();	
 		independentDoubleTranscriptions();
 		singleDedEdeTranspositions();
 		multiSingleDigitTransciption();

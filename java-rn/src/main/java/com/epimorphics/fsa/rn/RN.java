@@ -35,6 +35,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * @author skw
+ *
+ */
 public class RN {
 	
 	private static final long serialVersionUID = 2490953697826083512L;
@@ -76,33 +80,80 @@ public class RN {
 	private static final BigInteger ONETHOUSAND = BigInteger.valueOf(1000);
 	private static final BigInteger ONEHUNDRED  = BigInteger.valueOf(100);
 	
-	private int     authority  ;
-	private int     instance  ;
-	private int     type ;
+	private int           authority  ;
+	private int           instance  ;
+	private int           type ;
 	private ZonedDateTime instant = null ;
-	private String     rn_str = null ;
+	private String        rn_str = null ;
+	
 	
 	/**
-	 * Constructs a new rn form a decimal string
-	 * 
-	 * @param decimalForm A decimal number in string form to be encoded as an rn
-	 * @throws RNException 
+	 * @return the authority
 	 */
-	protected RN(String decimalForm) throws RNException  {
-		this(new BigInteger(decimalForm));
+	public int getAuthority() {
+		return authority;
+	}
+
+	/**
+	 * @return the instance
+	 */
+	public int getInstance() {
+		return instance;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public int getType() {
+		return type;
+	}
+
+	/**
+	 * @return the instant
+	 */
+	public ZonedDateTime getInstant() {
+		return instant;
 	}
 	
+	public String toString() {
+		return rn_str;
+	}
+	
+	/**
+	 * Constructs a new rn from a decimal form integer.
+	 * 
+	 * @param decimalForm    A decimal form integer
+	 * @throws RNException 
+	 */
+	
 	protected RN(BigInteger i) throws RNException {
-		parseDecimal(i);
+		parseDecimalForm(i);
 		rn_str = encode(i);		
+	}
+
+	
+	/**
+	 * Construct an RN from a String in encoded form.
+	 * @param encodedForm
+	 * @throws RNException
+	 */
+	protected RN(String encodedForm) throws RNException  {
+		BigInteger res = raw_decode(encodedForm);
+		if(!isValid(res))
+			throw new RNException("Invalid RN (failed digit check):" + encodedForm);
+
+		res = res.divide(baseSquared);
+		parseDecimalForm(res);
+		// Re-encode into common form.
+		rn_str =  encode(res);
 	}
 	
 	/*
-	 * parseDecimal
+	 * parseDecimalForm
 	 * 
 	 * Fast version that uses substring to break apart a BigDecimal.
 	 */
-	private void parseDecimal(BigInteger decimal) throws RNException {
+	private void parseDecimalForm(BigInteger decimal) throws RNException {
 		String i = String.format("%024d", decimal);
 
 		/*
@@ -147,61 +198,6 @@ public class RN {
 		}
 	}
 	
-	/*
-	 * parseDecimal (2)
-	 * 
-	 * 
-	 */
-	private void parseDecimal2(BigInteger decimal) throws RNException {
-		BigInteger i = decimal; 
-		int sec = i.mod(ONEHUNDRED).intValue();
-	    i = i.divide(ONEHUNDRED);
-		int min = i.mod(ONEHUNDRED).intValue();
-		i = i.divide(ONEHUNDRED);
-		int hour = i.mod(ONEHUNDRED).intValue();
-		i = i.divide(ONEHUNDRED);
-		int day  = i.mod(ONEHUNDRED).intValue();
-		i = i.divide(ONEHUNDRED);
-		int month = i.mod(ONEHUNDRED).intValue();
-		i = i.divide(ONEHUNDRED);
-		int year = i.mod(TENTHOUSAND).intValue();
-		i = i.divide(TENTHOUSAND);
-		
-		type = i.mod(ONEHUNDRED).intValue();
-		i = i.divide(ONEHUNDRED);
-		
-		instance = i.mod(BigInteger.TEN).intValue();
-		i = i.divide(BigInteger.TEN);
-		
-		authority = i.mod(TENTHOUSAND).intValue();
-		i = i.divide(TENTHOUSAND);
-		
-		int milli = i.mod(ONETHOUSAND).intValue();
-		i = i.divide(ONETHOUSAND);
-		
-		int residue = i.intValue();
-	
-		if( !(0<=milli   && milli<=999 &&
-		      0<=sec     && sec<=60    &&
-			  0<=min     && min<=59    &&
-			  0<=hour    && hour<=23   &&
-			  0<=day     && day<=31    &&
-			  1<=month   && month<=12  &&
-			  2000<=year && year<=9999 &&
-			  0<=type    && type<=99 &&
-			  0<=instance && instance<=9 &&
-			  1000<=authority && authority<=9999 &&
-			  residue == 0 ) ) {
-			throw new RNException("Bad Decimal form: "+ decimal);
-		}
-				
-		try {		
-			instant = ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC);
-		} catch (DateTimeException e) {
-			throw new RNException("Bad Decimal form (illegal date): "+i,  e);
-		}
-	}
-	
 	/**
 	 * Returns the encoded from of an rn
 	 * 
@@ -236,7 +232,7 @@ public class RN {
 	 * 
 	 * @return 
 	 */
-	public String getFieldedForm() {
+	public String getDecodedDecimalForm() {
 		return String.format("%04d",getAuthority())+
         ":" + String.format("%01d",getInstance())+
         ":" + String.format("%02d",getType())+
@@ -278,6 +274,10 @@ public class RN {
 		} catch (RNException e) {
 			return null ;
 		}	
+	}
+	
+	public static boolean isValid(String rn) {
+		return (decode(rn) != null);
 	}
 	
 	/**
@@ -331,36 +331,6 @@ public class RN {
 	}
 	
 	
-	/**
-	 * Checks the validity of an encoded rn string
-	 * 
-	 * @param rn_s rn string to be checked for validity
-	 * @return
-	 */
-	public static boolean isValid(String rn_s) {
-		BigInteger res;
-		try {
-			res = raw_decode(rn_s);
-		} catch (RNException e) {
-			return false ;
-		}		
-		return isValid(res);
-	}
-	
-	
-	private static Pattern p = Pattern.compile(
-			                      "[0-9]{3}"+                  //Millisec  000-999
-			                      "[1-9][0-9]{4}"+             //Authority + serial  1000-9990 + 0-9
-			                      "[0-9]{2}"+                  //Type  00-99
-	                              "[2-9][0-9]{3}"+             //Year  2000-9999
-	                              "((0[1-9])|(1[0-2]))"+       //Month 01-12
-	                              "(([0-2][0-9])|(3[0-1]))"+   //Day   01-31
-	                              "(([0-1][0-9])|(2[0-3]))"+   //Hour  00-23
-	                              "([0-5][0-9])"+              //Min   00-59
-	                              "([0-5][0-9])"               //Sec   00-59
-	                           ) ;
-	
-	
 	/** 
 	 * Checks the validity of a BigInteger as an rn string.
 	 * 
@@ -368,38 +338,9 @@ public class RN {
 	 * @return
 	 */
 	private static boolean isValid(BigInteger rn_i) {		
-		return rn_i.mod(prime).equals(BigInteger.ZERO)		 // Checksum
-			&& p.matcher(String.format("%024d",rn_i.divide(baseSquared))).matches() ;  // Number pattern
+		return rn_i.mod(prime).equals(BigInteger.ZERO) ;		 // Checksum
+			
 	}
-	
-	/**
-	 * @return the authority
-	 */
-	public int getAuthority() {
-		return authority;
-	}
-
-	/**
-	 * @return the instance
-	 */
-	public int getInstance() {
-		return instance;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public int getType() {
-		return type;
-	}
-
-	/**
-	 * @return the instant
-	 */
-	public ZonedDateTime getInstant() {
-		return instant;
-	}
-	
 	
 	/**
 	 * Returns the largest prime number below some limit.
@@ -437,7 +378,5 @@ public class RN {
 	    return primeNumbers;
 	}
 	
-	public String toString() {
-		return rn_str;
-	}
+	
 }

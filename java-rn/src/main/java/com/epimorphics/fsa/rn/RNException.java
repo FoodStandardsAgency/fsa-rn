@@ -26,10 +26,6 @@
  ******************************************************************************/
 package com.epimorphics.fsa.rn;
 
-/**
- * @author skw
- *
- */
 public class RNException extends Exception
 {
 	/**

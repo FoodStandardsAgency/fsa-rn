@@ -26,6 +26,7 @@
  *****************************************************************/
 package com.epimorphics.fsa.rn;
 
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -33,10 +34,6 @@ import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author skw
- *
- */
 public class RNFactory  {
 	private final int authority  ;
 	private final int instance ;
@@ -103,9 +100,8 @@ public class RNFactory  {
 		
 		String rrn_decimal = String.format("%03d%04d%01d%02d%04d%02d%02d%02d%02d%02d", milli, authority, instance, type, year, month, day, hour, min, sec);
 		
-		
 		try {
-			return new RN(rrn_decimal);
+			return new RN(new BigInteger(rrn_decimal));
 		} catch (RNException e) {
 			return null;
 		}
@@ -145,7 +141,7 @@ public class RNFactory  {
 		for(int i = 0; i<100; i++) {
 		   System.out.println( arr[i].getEncodedForm() + 
 				         " " + arr[i].getDecimalForm()+
-				         " " + arr[i].getFieldedForm() 
+				         " " + arr[i].getDecodedDecimalForm() 
 		   );
 		}
 		
@@ -161,7 +157,7 @@ public class RNFactory  {
 			if( (rn = RN.decode(ef)) == null)
 				System.out.println("Broken RN: "+ef);
 			else
-				System.out.println(rn.getEncodedForm()+" "+rn.getDecimalForm()+" "+rn.getFieldedForm());
+				System.out.println(rn.getEncodedForm()+" "+rn.getDecimalForm()+" "+rn.getDecodedDecimalForm());
 		}
 	}
 }
