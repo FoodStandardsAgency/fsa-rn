@@ -43,16 +43,17 @@ public class RN {
 
     private static final long serialVersionUID = 2490953697826083512L;
 
-    private static String     alphabet = "ABCDEFGHJKLMNPQRSTVWXYZ1234567890";
-    private static BigInteger alphaLen = BigInteger.valueOf(alphabet.length());
-    private static final int  base     = alphabet.length();
+    private static String           alphabet    = "ABCDEFGHJKLMNPQRSTVWXYZ1234567890";
+    private static final int        i_base      = alphabet.length(); // 33
+    private static BigInteger       base        = BigInteger.valueOf(i_base);
+    private static final BigInteger baseSquared = BigInteger.valueOf(i_base*i_base);               //1089
 
     // Calculate the largest prime less than the square of our number base (so that we have 2 check digits)
-    private static final BigInteger prime  = BigInteger.valueOf(largestPrimeBelow(base*base));
-    private static final BigInteger baseSquared = BigInteger.valueOf(base*base);
+    private static final BigInteger prime  = BigInteger.valueOf(largestPrimeBelow(i_base*i_base)); //1087
 
     // Compute the difference between the number base squared and the largest prime
     private static final BigInteger residual = baseSquared.subtract(prime);
+
     /*
      * For some value NN we compute check digits cc as follows:
      *
@@ -81,10 +82,10 @@ public class RN {
     private static final BigInteger ONEHUNDRED  = BigInteger.valueOf(100);
 
     private Authority authority;
-    private int           instance  ;
-    private int           type ;
-    private ZonedDateTime instant = null ;
-    private String        rn_str = null ;
+    private Instance  instance  ;
+    private Type      type ;
+    private Instant   instant = null ;
+    private String    rn_str = null ;
 
 
     /**
@@ -97,14 +98,14 @@ public class RN {
     /**
      * @return the instance
      */
-    public int getInstance() {
+    public Instance getInstance() {
         return instance;
     }
 
     /**
      * @return the type
      */
-    public int getType() {
+    public Type getType() {
         return type;
     }
 
@@ -112,7 +113,7 @@ public class RN {
      * @return the instant
      */
     public ZonedDateTime getInstant() {
-        return instant;
+        return instant.getInstant();
     }
 
     public String toString() {
@@ -155,6 +156,9 @@ public class RN {
      */
     private void parseDecimalForm(BigInteger decimal) throws RNException {
         String i = String.format("%024d", decimal);
+        if( i.length()!=24) {
+            throw new RNException("Bad Decimal form: "+ i);
+        }
 
         /*
          *          8       16  20
@@ -171,27 +175,13 @@ public class RN {
         int day   = Integer.parseInt(i.substring(16,18));
         int month = Integer.parseInt(i.substring(14,16));
         int year  = Integer.parseInt(i.substring(10,14));
-        type      = Integer.parseInt(i.substring(8,10));
-        instance  = Integer.parseInt(i.substring(7,8));
+        type      = new Type(i.substring(8,10));
+        instance  = new Instance(i.substring(7,8));
         authority = new Authority(i.substring(3,7));
         int milli = Integer.parseInt(i.substring(0,3));
 
-
-        if( !( i.length()==24 &&
-              0<=milli   && milli<=999 &&
-              0<=sec     && sec<=60    &&
-              0<=min     && min<=59    &&
-              0<=hour    && hour<=23   &&
-              1<=day     && day<=31    &&
-              1<=month   && month<=12  &&
-              2000<=year && year<=9999 &&
-              0<=type    && type<=99 &&
-              0<=instance && instance<=9 ) ) {
-            throw new RNException("Bad Decimal form: "+ i);
-        }
-
         try {
-            instant = ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC);
+            instant = new Instant( ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC) );
         } catch (DateTimeException e) {
             throw new RNException("Bad Decimal form (illegal date): "+i,  e);
         }
@@ -232,9 +222,9 @@ public class RN {
      * @return
      */
     public String getDecodedDecimalForm() {
-        return String.format("%04d",getAuthority())+
-        ":" + String.format("%01d",getInstance())+
-        ":" + String.format("%02d",getType())+
+        return String.format("%04d",getAuthority().getId())+
+        ":" + String.format("%01d",getInstance().getId())+
+        ":" + String.format("%02d",getType().getId())+
         ":" + getInstant();
     }
 
@@ -293,8 +283,8 @@ public class RN {
         int j = 0;
 
         do {
-            char ch = alphabet.charAt(  (i.mod( alphaLen  )).intValue() );
-            i = i.divide(alphaLen);
+            char ch = alphabet.charAt(  (i.mod( base  )).intValue() );
+            i = i.divide(base);
 
              res.insert(0,ch);
 
@@ -322,7 +312,7 @@ public class RN {
         rn_s = rn_s.replaceAll("[ -]+","");
         for(char ch : rn_s.toCharArray()) {
             int increment = alphabet.indexOf(ch);
-            res = res.multiply(alphaLen);
+            res = res.multiply(base);
 
             res = res.add(BigInteger.valueOf(increment) );
         }
