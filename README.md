@@ -17,7 +17,7 @@ The specification (version 0.1) is implemented initially in java ([java-rn](http
 to add
 
 ## Documentation and specification
-See the [project Wiki](https://github.com/FoodStandardsAgency/rrn-gen/wiki/FSA-RN-Documentation-and-Specification) for the specification and documentation
+See the [project Wiki](https://github.com/FoodStandardsAgency/fsa-rn/wiki) for the specification and documentation
 
 
 ## Feedback
