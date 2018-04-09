@@ -45,9 +45,30 @@ public class AuthorityTest {
     }
 
     @Test
+    public void shouldDecodeACorrectlyEncodedAuthority() {
+        try {
+            assertNotNull(new Authority("1000"));
+        }
+        catch (RNException e) {
+            fail("should not raise");
+        }
+    }
+
+    @Test
+    public void shouldNotConstructIncorrectlyEncodedAuthority() {
+        try {
+            assertNotNull(new Authority("100"));
+            fail("should not be permitted");
+        }
+        catch (RNException e) {
+        }
+    }
+
+    @Test
     public void shouldReturnTheAuthorityId() {
         try {
             assertEquals("should be the same identifier", 1111, new Authority(1111).getId());
+            assertEquals("should be the same identifier", 2222, new Authority("2222").getId());
         }
         catch (RNException e) {
             fail("should not raise");

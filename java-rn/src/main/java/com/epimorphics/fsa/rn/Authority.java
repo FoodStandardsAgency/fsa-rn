@@ -33,6 +33,16 @@ public class Authority {
     }
 
     /**
+     * Construct a new authority object from a string denoting the authority identifier
+     *
+     * @param authorityIdEnc The identity of the authority as a string
+     * @throws RNException if the identifier is not valid
+     */
+    public Authority(String authorityIdEnc) throws RNException {
+        this(Integer.parseInt(authorityIdEnc));
+    }
+
+    /**
      * Check if a given integer can denote a valid authority ID. Note: does not
      * check that this is an actual authority ID, since that would entail a network
      * lookup.
