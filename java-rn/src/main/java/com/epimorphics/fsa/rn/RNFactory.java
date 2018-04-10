@@ -30,16 +30,34 @@ import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.experimental.max.MaxCore;
+
 public class RNFactory  {
-	private final int authority  ;
-	private final int instance ;
-	private final int type       ;
-	private long prev = 0 ;
+	private final Authority authority  ;
+	private final Instance  instance   ;
+	private final Type      type       ;
+	private long  prev = 0 ;
 	
+	
+	public boolean equals(RNFactory other) {
+		return authority.equals(other.authority) &&
+               instance.equals(other.instance) &&
+               type.equals(other.type);
+	}
+	
+	@Override
+	public int hashCode() {
+		int res = authority.getId();		
+		res     = instance.getId() + res*(Instance.MAX_INSTANCE_ID+1);
+		res     = type.getId()     + res*(Type.MAX_TYPE_ID+1);	
+		return res;
+	}
 	
 	/*
 	 *  Use a Map to ensure there is a single factory instance for each authority,instance and type combination
@@ -49,24 +67,21 @@ public class RNFactory  {
 	
 	private static HashMap<Integer,RNFactory> factories = new HashMap<Integer,RNFactory>() ;
 	
-	public static RNFactory getFactory(int authority, int instance, int type) throws RNException {
-		checkFactoryFields(authority, instance, type);
-		int key = (((authority*10)+instance)*100)+type;
-		RNFactory res = null;
+	public static RNFactory getFactory(Authority authority, Instance instance, Type type) throws RNException {
+		RNFactory res = new RNFactory(authority, instance, type);
 		
 		synchronized (factories) {
-			res = factories.get(key);
-		   
-		    if(res == null) {
-			   res = new RNFactory(authority, instance, type);
-			   factories.put(key,res);
-		    }
-	      	return res;
+			if (factories.containsKey(res.hashCode())) {
+				res = factories.get(res.hashCode());
+			} else {
+				factories.put(res.hashCode(), res);
+			}
 		}
-	}
+		
+		return res;
+	}	
 	
-	
-	private RNFactory(int authority, int instance, int type) throws RNException {
+	private RNFactory(Authority authority, Instance instance, Type type) throws RNException {
 		this.authority = authority;
 		this.instance = instance;
 		this.type      = type;
@@ -87,45 +102,30 @@ public class RNFactory  {
 			}
 			prev = time;
 		}
-		Instant instant = Instant.ofEpochMilli(time);
-		LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
 		
-		long year  = ChronoField.YEAR.getFrom(ldt);
-		long month = ChronoField.MONTH_OF_YEAR.getFrom(ldt);
-		long day   = ChronoField.DAY_OF_MONTH.getFrom(ldt);
-		long hour  = ChronoField.HOUR_OF_DAY.getFrom(ldt);
-		long min   = ChronoField.MINUTE_OF_HOUR.getFrom(ldt);
-		long sec   = ChronoField.SECOND_OF_MINUTE.getFrom(ldt);
-		long milli = ChronoField.MILLI_OF_SECOND.getFrom(ldt);
 		
-		String rrn_decimal = String.format("%03d%04d%01d%02d%04d%02d%02d%02d%02d%02d", milli, authority, instance, type, year, month, day, hour, min, sec);
-		
+		ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time),ZoneOffset.UTC);
+
 		try {
-			return new RN(new BigInteger(rrn_decimal));
+			return new RN(authority, instance, type, zdt);
 		} catch (RNException e) {
 			return null;
 		}
-	}
-	
-	private static void checkFactoryFields(int authority, int instance, int type) throws RNException  {
-		if (authority<1000 || authority>9999 || instance>9 || type >99) {
-			StringBuffer msg = new StringBuffer();
-			
-			if(authority<1000 || authority>9999)
-				msg.append("Bad Authority Number (1000-9999): "+authority+ "; ");
-			if(instance>9)
-				msg.append("Bad instance number(0-9): "+instance+"; ");
-			if(type>99)
-				msg.append("Bad Reference Number Type (0-99): "+type+"; ");
-			throw new RNException( msg.toString());
-		}
+		
 	}
 	
 	public static void main(String[] args) {
 		// Make factory
 		RNFactory rnf = null;
+		RNFactory rnf2 = null;
 		try {
-			rnf = RNFactory.getFactory(1000, 1, 1);
+			rnf =  RNFactory.getFactory(new Authority(1000), new Instance(1), new Type(21)) ;
+			rnf2 = RNFactory.getFactory(new Authority(1000), new Instance(1), new Type(21)) ;
+			
+			if(rnf.equals(rnf2) && rnf != rnf2) {
+				System.out.println("RNFs are strangely different");
+			}
+			
 		} catch (RNException e1) {
 			System.err.println(e1.getMessage());
 			System.exit(1);
@@ -153,11 +153,14 @@ public class RNFactory  {
 			// Break the encoded form
 			
 			ef = ef.replaceAll("K","P");
+			
 			RN rn;
-			if( (rn = RN.decode(ef)) == null)
-				System.out.println("Broken RN: "+ef);
-			else
-				System.out.println(rn.getEncodedForm()+" "+rn.getDecimalForm()+" "+rn.getDecodedDecimalForm());
+			try {
+				rn = new RN(Codec.decode(ef));
+				System.out.println(rn.getEncodedForm()+" "+rn.getDecimalForm()+" "+rn.getDecodedDecimalForm());			
+			} catch (RNException e) {
+			    System.out.println(e.getMessage());	
+			}
 		}
 	}
 }

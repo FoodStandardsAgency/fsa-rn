@@ -54,10 +54,24 @@ public class Instant  {
 		int year = instant.getYear();
 		return MIN_INSTANT_YEAR <= year && year <= MAX_INSTANT_YEAR ;
 	}
+	
 	/**
 	 * @return the instant
 	 */
 	public  ZonedDateTime getInstant() {
 		return instant;
-	}	
+	}
+	
+
+	/**
+	 * @param other
+	 * @return
+	 */
+	public boolean equals(Instant other) {
+		return instant.equals(other.getInstant());
+	}
+	
+	public int hashCode() {
+		return instant.hashCode();
+	}
 }

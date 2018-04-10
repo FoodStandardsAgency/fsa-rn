@@ -61,4 +61,17 @@ public class Type {
     public int getId() {
         return id;
     }
+    
+	/**
+	 * @param other
+	 * @return
+	 */
+	public boolean equals(Type other) {
+		return getId() == other.getId();
+	}
+	
+	@Override
+    public int hashCode() {
+    	return getId();
+    }
 }

@@ -60,4 +60,18 @@ public class Authority {
     public int getId() {
         return id;
     }
+    
+    
+    /**
+     * @param other
+     * @return
+     */
+    public boolean equals(Authority other) {
+    	return getId() == other.getId();
+    }
+    
+    @Override
+    public int hashCode() {
+    	return getId();
+    }
 }

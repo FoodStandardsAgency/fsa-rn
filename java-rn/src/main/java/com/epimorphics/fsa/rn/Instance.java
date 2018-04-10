@@ -63,4 +63,17 @@ public class Instance {
     public int getId() {
         return id;
     }
+    
+    /**
+     * @param other
+     * @return
+     */
+    public boolean equals(Instance other) {
+    	return getId() == other.getId();
+    }
+    
+    @Override
+    public int hashCode() {
+    	return getId();
+    }
 }

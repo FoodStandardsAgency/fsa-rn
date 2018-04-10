@@ -8,6 +8,15 @@ import org.junit.Test;
  * Unit tests on {@link Authority}
  */
 public class AuthorityTest {
+	
+	@Test
+	public void equalityTest() {
+		try {
+			assertTrue("should be identical", new Authority(1001).equals(new Authority(1001)) );
+		} catch (RNException e) {
+			fail();
+		}
+	}
 
     @Test
     public void shouldAllowLegalAuthorityId() {

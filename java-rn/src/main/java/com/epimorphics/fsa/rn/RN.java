@@ -28,6 +28,7 @@ package com.epimorphics.fsa.rn;
 
 import java.math.BigInteger;
 import java.time.DateTimeException;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
@@ -36,58 +37,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * @author skw
- *
- */
-public class RN {
+public class RN implements Comparable<RN> {
 
-    private static final long serialVersionUID = 2490953697826083512L;
-
-    private static String           alphabet    = "ABCDEFGHJKLMNPQRSTVWXYZ1234567890";
-    private static final int        i_base      = alphabet.length();                               // 33
-    private static BigInteger       base        = BigInteger.valueOf(i_base);
-    private static final BigInteger baseSquared = BigInteger.valueOf(i_base*i_base);               //1089
-
-    // Calculate the largest prime less than the square of our number base (so that we have 2 check digits)
-    private static final BigInteger prime  = BigInteger.valueOf(largestPrimeBelow(i_base*i_base)); //1087
-
-    // Compute the difference between the number base squared and the largest prime
-    private static final BigInteger residual = baseSquared.subtract(prime);
-
-    /*
-     * For some value NN we compute check digits cc as follows:
-     *
-     *  cc = prime - ((base^2 * NN) mod prime)
-     *
-     *  But
-     *  	base^2 = prime + residual
-     *
-     *  So  (base^2 * NN) mod prime
-     *      = ((prime * NN) mod prime) + ((residual * NN) mod prime)
-     *      = 0 + ((residual * NN) mod prime)
-     *      = (residual * NN) mod prime)
-     *
-     *  cc = largestPrime - ((residual*value) mod prime)
-     *
-     *  checked_NN = (NN * base^2) + cc
-     *
-     *  Checking checked_NN: Test for (checked_NN mod largestPrime) == 0
-     *
-     *  Recovering NN: NN = checked_NN / base^2
-     *
-     */
-
-    private static final BigInteger TENTHOUSAND = BigInteger.valueOf(10000);
-    private static final BigInteger ONETHOUSAND = BigInteger.valueOf(1000);
-    private static final BigInteger ONEHUNDRED  = BigInteger.valueOf(100);
-
-    private Authority  authority;
-    private Instance   instance  ;
-    private Type       type ;
-    private Instant    instant = null ;
-    private String     rn_str = null ;
-    private BigInteger rn_int = null;
+    private Authority  authority;			// Issuing authority
+    private Instance   instance  ;			// Deployed reference number generator service instance
+    private Type       type ;		        // Reference number type
+    private Instant    instant = null ;     // Time instant when issued (1ms precision)
+    private String     rn_str = null ;      // External reference number string form (base 33 encoded integer with check digits)
+    private BigInteger rn_int = null;       // Decoded reference number (decimal form integer) 
 
 
     /**
@@ -123,6 +80,17 @@ public class RN {
     }
     
     
+    /**
+     * Construct an RN form its constituent parts.
+     * 
+     * May throw an RNException if the dateTime indicated by instant is outside the range permitted for RNs.
+     * 
+     * @param authority issuing authority
+     * @param instance  issuing service instance
+     * @param type      reference number type
+     * @param instant   time instant when issued
+     * @throws RNException
+     */
     RN(Authority authority, Instance instance, Type type, ZonedDateTime instant) throws RNException {
     	this.authority = authority;
     	this.instance  = instance;
@@ -131,7 +99,9 @@ public class RN {
     }
 
     /**
-     * Constructs a new rn from a decimal form integer.
+     * Constructs a new RN from a decimal form integer.
+     * 
+     * May throw an RNException if any of the embedded field values are outside their permitted ranges.
      *
      * @param decimalForm    A decimal form integer
      * @throws RNException
@@ -144,24 +114,24 @@ public class RN {
 
 
     /**
-     * Construct an RN from a String in encoded form.
-     * @param encodedForm
+     * Construct an RN from its encoded form (base 33 encoded string with check digits).
+     * 
+     *  May throw an RNException if an if the embedded field values are outside their permitted ranges.
+     * 
+     * @param  encodedForm
      * @throws RNException
      */
     protected RN(String encodedForm) throws RNException  {
-        BigInteger res = raw_decode(encodedForm);
-        if(!isValid(res))
-            throw new RNException("Invalid RN (failed digit check):" + encodedForm);
-
-        //Remove the check digits
-        rn_int = res.divide(baseSquared);
-        parseDecimalForm(rn_int);
+    	rn_int = Codec.decode(encodedForm);
+        parseDecimalForm(rn_int);    	
     }
 
-    /*
-     * parseDecimalForm
-     *
-     * Fast version that uses substring to break apart a BigDecimal.
+    /**
+     * Parses the integer value of an RN's decimal form into 
+     * its constituent Authority, Instance, Type and Instant fields.
+     * 
+     * @param decimal The decimal value to be parsed.
+     * 
      */
     private void parseDecimalForm(BigInteger decimal) throws RNException {
         String i = String.format("%024d", decimal);
@@ -197,14 +167,14 @@ public class RN {
     }
 
     /**
-     * Returns the encoded from of an rn
+     * Returns the (Base 33) encoded form of a RN
      *
-     * @return The encoded string form of an rn.
+     * @return The encoded string form of an RN (including check digits).
      */
     public String getEncodedForm() {
     	if(rn_str == null) {
     		rn_int = new BigInteger(getDecimalForm());
-    		rn_str = encode(rn_int);
+    		rn_str = Codec.encode(rn_int);
     	}
         return rn_str;
     }
@@ -232,6 +202,8 @@ public class RN {
      *   - instance
      *   - type
      *   - instant (as a UTC 8601 dateTime string)
+     *   
+     *   aaaa:i:tt:yyyy-MM-ddThh:mm:ss.uuuZ
      *
      * @return
      */
@@ -241,145 +213,24 @@ public class RN {
         ":" + String.format("%02d",getType().getId())+
         ":" + getInstant();
     }
-
-    /**
-     * A static function that encodes a BigInteger into the rn encoded form.
-     *
-     * @param i	A BigInteger to be encoded
-     * @return  A String carrying the rn in encoded form.
-     */
-    public static String encode(BigInteger i) {
-        // cc = prime - ((i*residual) mod prime)
-        BigInteger cc = prime.subtract(i.multiply(residual).mod(prime)) ;
-        // i = i*base^2 + cc
-        i = i.multiply(baseSquared).add(cc);
-        StringBuffer res = new StringBuffer(raw_encode(i));
-
-        return res.toString();
+    
+    public boolean equals (RN other) {
+    	return authority.equals(other.getAuthority()) &&
+    		   instance.equals(other.getInstance()) &&
+    		   type.equals(other.getType()) &&
+    		   instant.equals(other.getInstant()) ;
     }
 
-
-    /**
-     * Decodes from the string form of an rn to its decimal value.
-     *
-     * The input rn value is checked for correct check digits and syntactic form
-     *
-     * @param rn Encoded rn string to be checked.
-     * @return
-     * @throws RNException
-     */
-    public static RN decode(String rn)  {
-        BigInteger res;
-        try {
-            res = raw_decode(rn);
-//		     return isValid(res) ? String.format("%024d",res.divide(baseSquared)) : null ;
-            return isValid(res) ? new RN(res.divide(baseSquared)) : null ;
-        } catch (RNException e) {
-            return null ;
-        }
-    }
-
-    public static boolean isValid(String rn) {
-        return (decode(rn) != null);
-    }
-
-    /**
-     * Encodes a BigInteger value using the character alphabet and number base (33) used for rns
-     *
-     * A '-' character is inserted between each group of 4 characters to improve readability.
-     * These characters are ignored when decoding an rn string.
-     *
-     * @param i BigInteger value to be base 33 encoded.
-     * @return
-     */
-    private static String raw_encode(BigInteger i) {
-        StringBuffer res = new StringBuffer();
-        int j = 0;
-
-        do {
-            char ch = alphabet.charAt(  (i.mod( base  )).intValue() );
-            i = i.divide(base);
-
-             res.insert(0,ch);
-
-            if(++j%6 == 0 && j<18 ) {
-                res.insert(0, '-');
-            }
-        } while ( i.compareTo(BigInteger.ZERO) > 0 || j<18);
-
-        return res.toString();
-    }
-
-    /**
-     * Decodes an base 33 encoded number string to a BigInteger.
-     *
-     * @param rn_s Base 33 encoded string
-     * @return
-     * @throws RNException
-     */
-    private static BigInteger raw_decode(String rn_s) throws RNException {
-        BigInteger res = BigInteger.ZERO;
-
-        if (!rn_s.matches("["+alphabet+" -]+"))
-                throw new RNException("Bad Reference number \""+rn_s+"\" contains character not in alphabet: ["+alphabet+"]");
-
-        rn_s = rn_s.replaceAll("[ -]+","");
-        for(char ch : rn_s.toCharArray()) {
-            int increment = alphabet.indexOf(ch);
-            res = res.multiply(base);
-
-            res = res.add(BigInteger.valueOf(increment) );
-        }
-        return res;
-    }
-
-
-    /**
-     * Checks the validity of a BigInteger as an rn string.
-     *
-     * @param rn_i
-     * @return
-     */
-    private static boolean isValid(BigInteger rn_i) {
-        return rn_i.mod(prime).equals(BigInteger.ZERO) ;		 // Checksum
-
-    }
-
-    /**
-     * Returns the largest prime number below some limit.
-     *
-     * @param limit The upper limit the that the sought prime is below.
-     * @return
-     */
-    private static int largestPrimeBelow (int limit) {
-        List<Integer> primes = sieveOfEratosthenes(limit);
-        return primes.get(primes.size()-1);
-    }
-
-    /**
-     * Generate a list of prime numbers upto and including n.
-     *
-     * @param n
-     * @return
-     */
-    private static List<Integer> sieveOfEratosthenes(int n) {
-        boolean prime[] = new boolean[n + 1];
-        Arrays.fill(prime, true);
-        for (int p = 2; p * p <= n; p++) {
-            if (prime[p]) {
-                for (int i = p * 2; i <= n; i += p) {
-                    prime[i] = false;
-                }
-            }
-        }
-        List<Integer> primeNumbers = new LinkedList<>();
-        for (int i = 2; i <= n; i++) {
-            if (prime[i]) {
-                primeNumbers.add(i);
-            }
-        }
-        return primeNumbers;
-    }
-
-
+	/**
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 * 
+	 * Order by decoded decimal form
+	 * 
+	 * aaaa:i:tt:yyyy-MM-ddThh:mm:ss.uuuZ
+	 */
+    @Override
+	public int compareTo(RN other){
+    	return getDecodedDecimalForm().compareTo(other.getDecodedDecimalForm());
+	}
+    	
 }
