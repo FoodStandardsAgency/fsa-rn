@@ -30,6 +30,7 @@ import java.math.BigInteger;
 import java.time.DateTimeException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class RN {
     private static final long serialVersionUID = 2490953697826083512L;
 
     private static String           alphabet    = "ABCDEFGHJKLMNPQRSTVWXYZ1234567890";
-    private static final int        i_base      = alphabet.length(); // 33
+    private static final int        i_base      = alphabet.length();                               // 33
     private static BigInteger       base        = BigInteger.valueOf(i_base);
     private static final BigInteger baseSquared = BigInteger.valueOf(i_base*i_base);               //1089
 
@@ -81,11 +82,12 @@ public class RN {
     private static final BigInteger ONETHOUSAND = BigInteger.valueOf(1000);
     private static final BigInteger ONEHUNDRED  = BigInteger.valueOf(100);
 
-    private Authority authority;
-    private Instance  instance  ;
-    private Type      type ;
-    private Instant   instant = null ;
-    private String    rn_str = null ;
+    private Authority  authority;
+    private Instance   instance  ;
+    private Type       type ;
+    private Instant    instant = null ;
+    private String     rn_str = null ;
+    private BigInteger rn_int = null;
 
 
     /**
@@ -117,7 +119,15 @@ public class RN {
     }
 
     public String toString() {
-        return rn_str;
+        return getEncodedForm();
+    }
+    
+    
+    RN(Authority authority, Instance instance, Type type, ZonedDateTime instant) throws RNException {
+    	this.authority = authority;
+    	this.instance  = instance;
+    	this.type      = type;
+    	this.instant   = new Instant(instant);
     }
 
     /**
@@ -129,7 +139,7 @@ public class RN {
 
     protected RN(BigInteger i) throws RNException {
         parseDecimalForm(i);
-        rn_str = encode(i);
+        rn_int = i;
     }
 
 
@@ -143,10 +153,9 @@ public class RN {
         if(!isValid(res))
             throw new RNException("Invalid RN (failed digit check):" + encodedForm);
 
-        res = res.divide(baseSquared);
-        parseDecimalForm(res);
-        // Re-encode into common form.
-        rn_str =  encode(res);
+        //Remove the check digits
+        rn_int = res.divide(baseSquared);
+        parseDecimalForm(rn_int);
     }
 
     /*
@@ -157,7 +166,7 @@ public class RN {
     private void parseDecimalForm(BigInteger decimal) throws RNException {
         String i = String.format("%024d", decimal);
         if( i.length()!=24) {
-            throw new RNException("Bad Decimal form: "+ i);
+            throw new RNException("Bad Decimal form (incorrect length): "+ i);
         }
 
         /*
@@ -193,23 +202,28 @@ public class RN {
      * @return The encoded string form of an rn.
      */
     public String getEncodedForm() {
+    	if(rn_str == null) {
+    		rn_int = new BigInteger(getDecimalForm());
+    		rn_str = encode(rn_int);
+    	}
         return rn_str;
     }
 
-
-    /**
-     * Returns the decoded decimal form of an rn as a string of decimal digits.
-     *
-     * @return The decoded decimal string form of an rn
-     */
-    public String getDecimalForm() {
-        try {
-            return String.format("%024d", raw_decode(rn_str).divide(baseSquared));
-        } catch (RNException e) {
-            // Should never happen
-            return null;
-        }
-    }
+	/**
+	 * @return
+	 */
+	protected String getDecimalForm() {
+		ZonedDateTime timestamp = instant.getInstant();
+		long year  = ChronoField.YEAR.getFrom(timestamp);
+		long month = ChronoField.MONTH_OF_YEAR.getFrom(timestamp);
+		long day   = ChronoField.DAY_OF_MONTH.getFrom(timestamp);
+		long hour  = ChronoField.HOUR_OF_DAY.getFrom(timestamp);
+		long min   = ChronoField.MINUTE_OF_HOUR.getFrom(timestamp);
+		long sec   = ChronoField.SECOND_OF_MINUTE.getFrom(timestamp);
+		long milli = ChronoField.MILLI_OF_SECOND.getFrom(timestamp);
+		String decimalForm = String.format("%03d%04d%01d%02d%04d%02d%02d%02d%02d%02d", milli, authority.getId(), instance.getId(), type.getId(), year, month, day, hour, min, sec);
+		return decimalForm;
+	}
 
     /**
      * Return a fielded string form of the identifier that reveals its components

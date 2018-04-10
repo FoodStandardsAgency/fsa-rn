@@ -24,7 +24,7 @@
  * SOFTWARE.
  * 
  *****************************************************************/
-package com.epimorphics.fsa.rn;
+package com.epimorphics.fsa.rn.analysis;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
