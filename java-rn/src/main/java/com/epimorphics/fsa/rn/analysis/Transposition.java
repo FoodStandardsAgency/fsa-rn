@@ -28,6 +28,8 @@ package com.epimorphics.fsa.rn.analysis;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 public class Transposition {
 	static int i_base  = 33;
@@ -125,6 +127,8 @@ public class Transposition {
 		 *
 		 */
 		int min_indices = Integer.MAX_VALUE;
+		
+		TreeMap<Integer,ArrayList<ArrayList<Integer>>> resultMap = new TreeMap<>();	
 		boolean contiguous_indices = false;
 		long trials = 0;
 		long sets = 0;
@@ -151,11 +155,24 @@ public class Transposition {
 					}
 				}
 				contiguous_indices = local_contiguous ? true : contiguous_indices;
-				
+			
+				ArrayList<ArrayList<Integer>> resultEntry = null;
+				if((resultEntry = resultMap.get(indices.size())) == null) {
+					resultEntry = new ArrayList<>();
+					resultMap.put(indices.size(), resultEntry);
+				}
+				resultEntry.add(indices);
+					
 				System.out.println("Indices found: "+ indices.size()+":"+indices +":"+values);	
 			}
 		}
 		System.out.println("Min size of indices: " + min_indices+ " Contiguous Index Group: "+contiguous_indices);
 		System.out.println("Found "+sets+" in "+trials+" trials");
+		for( Entry<Integer, ArrayList<ArrayList<Integer>>> entry : resultMap.entrySet()) {
+			ArrayList<ArrayList<Integer>> res = entry.getValue();
+			for(ArrayList<Integer> indices : res) {
+				System.out.println(entry.getKey().toString() +':'+ indices.toString() );	
+			}
+		}
 	}
 }
