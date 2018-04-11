@@ -28,25 +28,22 @@ package com.epimorphics.fsa.rn;
 
 import java.math.BigInteger;
 import java.time.DateTimeException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
+import com.epimorphics.fsa.rn.TimeStamp;
+
 
 public class RN implements Comparable<RN> {
 
     private Authority  authority;			// Issuing authority
     private Instance   instance  ;			// Deployed reference number generator service instance
     private Type       type ;		        // Reference number type
-    private Instant    instant = null ;     // Time instant when issued (1ms precision)
-    private String     rn_str = null ;      // External reference number string form (base 33 encoded integer with check digits)
-    private BigInteger rn_int = null;       // Decoded reference number (decimal form integer) 
-
-
+    private TimeStamp  timestamp = null ;   // Time instant when issued (1ms precision)
+    private String     rn_str    = null ;   // External reference number string form (base 33 encoded integer with check digits)
+    private BigInteger rn_int    = null;    // Decoded reference number (decimal form integer) 
+    
     /**
      * @return the authority
      */
@@ -71,8 +68,8 @@ public class RN implements Comparable<RN> {
     /**
      * @return the instant
      */
-    public ZonedDateTime getInstant() {
-        return instant.getInstant();
+    public TimeStamp getInstant() {
+    	return timestamp;
     }
 
     public String toString() {
@@ -95,7 +92,7 @@ public class RN implements Comparable<RN> {
     	this.authority = authority;
     	this.instance  = instance;
     	this.type      = type;
-    	this.instant   = new Instant(instant);
+    	this.timestamp = new TimeStamp(instant);
     }
 
     /**
@@ -160,7 +157,7 @@ public class RN implements Comparable<RN> {
         int milli = Integer.parseInt(i.substring(0,3));
 
         try {
-            instant = new Instant( ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC) );
+            timestamp = new TimeStamp( ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC) );
         } catch (DateTimeException e) {
             throw new RNException("Bad Decimal form (illegal date): "+i,  e);
         }
@@ -174,7 +171,12 @@ public class RN implements Comparable<RN> {
     public String getEncodedForm() {
     	if(rn_str == null) {
     		rn_int = new BigInteger(getDecimalForm());
-    		rn_str = Codec.encode(rn_int);
+    		try {
+				rn_str = Codec.encode(rn_int);
+			} catch (RNException e) {
+				// Should never happen
+				rn_str = null; 
+			}
     	}
         return rn_str;
     }
@@ -183,14 +185,14 @@ public class RN implements Comparable<RN> {
 	 * @return
 	 */
 	protected String getDecimalForm() {
-		ZonedDateTime timestamp = instant.getInstant();
-		long year  = ChronoField.YEAR.getFrom(timestamp);
-		long month = ChronoField.MONTH_OF_YEAR.getFrom(timestamp);
-		long day   = ChronoField.DAY_OF_MONTH.getFrom(timestamp);
-		long hour  = ChronoField.HOUR_OF_DAY.getFrom(timestamp);
-		long min   = ChronoField.MINUTE_OF_HOUR.getFrom(timestamp);
-		long sec   = ChronoField.SECOND_OF_MINUTE.getFrom(timestamp);
-		long milli = ChronoField.MILLI_OF_SECOND.getFrom(timestamp);
+		ZonedDateTime zdt = timestamp.getInstant();
+		long year  = ChronoField.YEAR.getFrom(zdt);
+		long month = ChronoField.MONTH_OF_YEAR.getFrom(zdt);
+		long day   = ChronoField.DAY_OF_MONTH.getFrom(zdt);
+		long hour  = ChronoField.HOUR_OF_DAY.getFrom(zdt);
+		long min   = ChronoField.MINUTE_OF_HOUR.getFrom(zdt);
+		long sec   = ChronoField.SECOND_OF_MINUTE.getFrom(zdt);
+		long milli = ChronoField.MILLI_OF_SECOND.getFrom(zdt);
 		String decimalForm = String.format("%03d%04d%01d%02d%04d%02d%02d%02d%02d%02d", milli, authority.getId(), instance.getId(), type.getId(), year, month, day, hour, min, sec);
 		return decimalForm;
 	}
@@ -211,14 +213,28 @@ public class RN implements Comparable<RN> {
         return String.format("%04d",getAuthority().getId())+
         ":" + String.format("%01d",getInstance().getId())+
         ":" + String.format("%02d",getType().getId())+
-        ":" + getInstant();
+        ":" + timestamp.getInstant();
     }
     
-    public boolean equals (RN other) {
-    	return authority.equals(other.getAuthority()) &&
-    		   instance.equals(other.getInstance()) &&
-    		   type.equals(other.getType()) &&
-    		   instant.equals(other.getInstant()) ;
+    @Override
+    public boolean equals (Object other) {
+    	if(other instanceof RN) {
+    		RN o = (RN) other;
+        	return authority.equals(o.getAuthority()) &&
+         		   instance.equals(o.getInstance()) &&
+         		   type.equals(o.getType()) &&
+         		   timestamp.equals(o.getInstant()) ;
+    	}
+    	return false;
+    }
+    
+    @Override
+    public int hashCode() {
+    	int hc = timestamp.hashCode();
+    	hc = authority.getId() + hc*(Authority.MAX_AUTHORITY_ID+1) + hc>>>16 ;
+    	hc = instance.getId()  + hc*(Instance.MAX_INSTANCE_ID+1)   + hc>>>16; 
+    	hc = type.getId()      + hc*(Type.MAX_TYPE_ID+1)           + hc>>>16;
+    	return hc;
     }
 
 	/**

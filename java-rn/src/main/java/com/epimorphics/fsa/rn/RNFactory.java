@@ -28,15 +28,10 @@ package com.epimorphics.fsa.rn;
 
 import java.math.BigInteger;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.experimental.max.MaxCore;
 
 public class RNFactory  {
 	private final Authority authority  ;
@@ -104,15 +99,17 @@ public class RNFactory  {
 		}
 		
 		
-		ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time),ZoneOffset.UTC);
+		ZonedDateTime instant = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time),ZoneOffset.UTC);
 
 		try {
-			return new RN(authority, instance, type, zdt);
+			return new RN(authority, instance, type, instant);
 		} catch (RNException e) {
 			return null;
 		}
 		
 	}
+	
+	/** @@TODO Factor this main out into some JUnit tests */
 	
 	public static void main(String[] args) {
 		// Make factory
@@ -133,8 +130,15 @@ public class RNFactory  {
 		
 		// Generate some RN's
 		RN [] arr = new RN[100];
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 99; i++) {
 			arr[i] = rnf.generateReferenceNumber();
+		}
+		
+		try {
+			arr[99] = new RN( new BigInteger("999999999999991231235959"));
+		} catch (RNException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 
 		// Print them out in various forms.

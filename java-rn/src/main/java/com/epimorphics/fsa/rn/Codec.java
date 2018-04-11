@@ -44,18 +44,20 @@ import java.util.regex.Pattern;
 
 	    private static final long serialVersionUID = 2490953697826083512L;
 
-	    private static String           alphabet    = "ABCDEFGHJKLMNPQRSTVWXYZ1234567890";
-	    private static final int        i_base      = alphabet.length();                               // 33
-	    private static BigInteger       base        = BigInteger.valueOf(i_base);
-	    private static final BigInteger baseSquared = BigInteger.valueOf(i_base*i_base);               //1089
+	    private static final String       alphabet    = "ABCDEFGHJKLMNPQRSTVWXYZ1234567890";
+	    private static final int          i_base      = alphabet.length();                               // 33
+	    private static final BigInteger   base        = BigInteger.valueOf(i_base);
+	    private static final BigInteger   baseSquared = BigInteger.valueOf(i_base*i_base);               //1089
+	    private static final int          MAX_DIGITS  = 18 ;       
+	    private static final BigInteger   MAX_INT     = base.pow(MAX_DIGITS);
 
-	    // Calculate the largest prime less than the square of our number base (so that we have 2 check digits)
-	    private static final BigInteger prime  = BigInteger.valueOf(largestPrimeBelow(i_base*i_base)); //1087
+	    // 1087 is the largest prime below 1089 (base^2)
+	    private static final BigInteger prime  = BigInteger.valueOf(1087); 
 
 	    // Compute the difference between the number base squared and the largest prime
 	    private static final BigInteger residual = baseSquared.subtract(prime);
 
-	    /*
+	    /**
 	     * For some value NN we compute check digits cc as follows:
 	     *
 	     *  cc = prime - ((base^2 * NN) mod prime)
@@ -80,48 +82,72 @@ import java.util.regex.Pattern;
 
 
 	    /**
-	     * A static function that encodes a BigInteger into the rn encoded form.
+	     * A static function that encodes a BigInteger into base 33 
+	     * serialised form with additional check digits.
 	     *
 	     * @param i	A BigInteger to be encoded
-	     * @return  A String carrying the rn in encoded form.
+	     * @return  A String carrying the base 33 serialized form.
+	     * @throws RNException 
 	     */
-	    public static String encode(BigInteger i) {
+	    public static String encode(BigInteger i) throws RNException {
 	        // cc = prime - ((i*residual) mod prime)
 	        BigInteger cc = prime.subtract(i.multiply(residual).mod(prime)) ;
 	        // i = i*base^2 + cc
 	        i = i.multiply(baseSquared).add(cc);
 	        
+	        //Serialise in base 33
 	        return raw_encode(i);
 	    }
 
 	    /**
-	     * Encodes a BigInteger value using the character alphabet and number base (33) used for rns
+	     * Encodes a BigInteger value using the character alphabet and number base (33) used for RNs
 	     *
 	     * A '-' character is inserted between each group of 4 characters to improve readability.
 	     * These characters are ignored when decoding an rn string.
 	     *
 	     * @param i BigInteger value to be base 33 encoded.
-	     * @return
+	     * @return  Base 33 serialised form of the given integer.
+	     * @throws RNException 
 	     */
-	    private static String raw_encode(BigInteger i) {
+	    private static String raw_encode(BigInteger i) throws RNException {
+	    	//Range check
+	    	if(i.compareTo(BigInteger.ZERO)<0) 
+              	throw new RNException(String.format("Negative values no allowed: %d", i));
+	        if( i.compareTo(MAX_INT) > 0)
+	            throw new RNException(String.format("Numeric overflow: %d too large MAX_INT = %d", i, MAX_INT));
+	        
 	        StringBuffer res = new StringBuffer();
 	        int j = 0;
-
+	        
+	        // Build result from least to most significant (base 33 digit).
 	        do {
-	            char ch = alphabet.charAt(  (i.mod( base  )).intValue() );
+	        	// Retrieve next digit
+	            char ch = alphabet.charAt( (i.mod( base  )).intValue() );
+	            // Shift right one place ready for the next digit
 	            i = i.divide(base);
-
+	            // Insert this digit as the next most significant digit
 	            res.insert(0,ch);
 
-	            if(++j%6 == 0 && j<18 ) {
+	            //Add some '-' for readability
+	            if(++j%6 == 0 && j<MAX_DIGITS ) {
 	                res.insert(0, '-');
 	            }
-	        } while ( i.compareTo(BigInteger.ZERO) > 0 || j<18);
-
+	        } while ( i.compareTo(BigInteger.ZERO) > 0 || j<MAX_DIGITS);
+        	
 	        return res.toString();
 	    }
-	    
-	    public static BigInteger decode(String i_b33) throws RNException {
+
+		/**
+		 * Check the validity of the check digits on the inbound base 33 encoded value
+		 * If valid, removes the check digits and returns the originally encoded integer value.
+		 * 
+		 * Throws an RNException if the digit check fails.
+		 * 
+		 * @param i_b33
+		 * @return
+		 * @throws RNException
+		 */
+		public static BigInteger decode(String i_b33) throws RNException {
 	    	BigInteger i = raw_decode(i_b33);
 	    	if(isValid(i)) {
 	    		return i.divide(baseSquared);
@@ -130,10 +156,12 @@ import java.util.regex.Pattern;
 	    }
 
 	    /**
-	     * Decodes an base 33 encoded number string to a BigInteger.
+	     * Decodes an base 33 encoded number string to an integer.
+	     * 
+	     * Throws and RNException if the inbound string is mal-formed.
 	     *
 	     * @param i_b33 Base 33 encoded string
-	     * @return
+	     * @return  
 	     * @throws RNException
 	     */
 	    private static BigInteger raw_decode(String i_b33) throws RNException {
@@ -154,7 +182,7 @@ import java.util.regex.Pattern;
 
 
 	    /**
-	     * Checks the validity of a BigInteger as an rn string.
+	     * Checks the validity of check digits in integer form (mod 1087) 
 	     *
 	     * @param i
 	     * @return
@@ -164,6 +192,12 @@ import java.util.regex.Pattern;
 
 	    }	    
 	    
+	    /**
+	     * Checks the validity of a Base 33 encoded number with (mod 1087) check digits.
+	     * 
+	     * @param i_b33
+	     * @return
+	     */
 	    public static boolean isValid(String i_b33) {
 	    	try {
 				return isValid(raw_decode(i_b33));
@@ -172,44 +206,6 @@ import java.util.regex.Pattern;
 				return false;
 			}
 	    }
-
-	    /**
-	     * Returns the largest prime number below some limit.
-	     *
-	     * @param limit The upper limit the that the sought prime is below.
-	     * @return
-	     */
-	    private static int largestPrimeBelow (int limit) {
-	        List<Integer> primes = sieveOfEratosthenes(limit);
-	        return primes.get(primes.size()-1);
-	    }
-
-	    /**
-	     * Generate a list of prime numbers upto and including n.
-	     *
-	     * @param n
-	     * @return
-	     */
-	    private static List<Integer> sieveOfEratosthenes(int n) {
-	        boolean prime[] = new boolean[n + 1];
-	        Arrays.fill(prime, true);
-	        for (int p = 2; p * p <= n; p++) {
-	            if (prime[p]) {
-	                for (int i = p * 2; i <= n; i += p) {
-	                    prime[i] = false;
-	                }
-	            }
-	        }
-	        List<Integer> primeNumbers = new LinkedList<>();
-	        for (int i = 2; i <= n; i++) {
-	            if (prime[i]) {
-	                primeNumbers.add(i);
-	            }
-	        }
-	        return primeNumbers;
-	    }
-
-
 	}
 
 	

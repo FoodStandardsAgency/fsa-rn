@@ -1,5 +1,5 @@
 /******************************************************************
- * File:        Instant.java   
+ * File:        TimeStamp.java   
  * Created by:  Stuart Williams (skw@epimorphics.com)
  * Created on:  9 Apr 2018
  * 
@@ -26,6 +26,7 @@
  *****************************************************************/
 package com.epimorphics.fsa.rn;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -35,19 +36,20 @@ import java.time.ZonedDateTime;
  * and the end of 9999.
  *
  */
-public class Instant  {
+public class TimeStamp  {
 	private ZonedDateTime instant;
 	
 	private static int MIN_INSTANT_YEAR = 2000 ;
 	private static int MAX_INSTANT_YEAR = 9999 ;
 	
-	Instant(ZonedDateTime instant) throws RNException {
+	public TimeStamp(ZonedDateTime instant) throws RNException {
+		instant = instant.withZoneSameInstant(ZoneOffset.UTC);
 		if(!isValidInstant(instant)) {		
 			throw new RNException(String.format("Illegal instant year: %d is not in the range %d : %d",
 								                instant.getYear(), MIN_INSTANT_YEAR, MAX_INSTANT_YEAR)
 		    );
 		}
-		this.instant = instant;		
+		this.instant =  instant;
 	}
 
 	public static boolean isValidInstant(ZonedDateTime instant) {
@@ -62,16 +64,15 @@ public class Instant  {
 		return instant;
 	}
 	
-
 	/**
 	 * @param other
 	 * @return
 	 */
-	public boolean equals(Instant other) {
-		return instant.equals(other.getInstant());
+	public boolean equals(TimeStamp other) {
+		return instant.equals(other.instant);
 	}
 	
-	public int hashCode() {
+	public int hashCode() {	
 		return instant.hashCode();
 	}
 }
