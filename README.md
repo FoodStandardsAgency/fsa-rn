@@ -25,6 +25,10 @@ to add
 ## Documentation and specification
 See the [project Wiki](https://github.com/FoodStandardsAgency/fsa-rn/wiki) for the **specification** and other documentation such as context, rational and detail on the underlying methods.
 
+Document Version 0.1
+Specification Version 0.1
+java implementation ([java-rn](java-rn) - Version 0.0.1)
+
 
 ## Feedback
 We would like to understand and problems with the design or approach that you may have.  Please feedback to: data@food.gov.uk
