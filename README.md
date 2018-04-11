@@ -1,3 +1,6 @@
+<a href="https://github.com/FoodStandardsAgency/fsa-rn/wiki/images/alpha-banner.png"><img src="https://github.com/FoodStandardsAgency/fsa-rn/wiki/images/alpha-banner.png"
+alt="ALPHA" width="70" height="20" border="0" /></a>
+
 # Reference Number Generation tooling (fsa-rn)
 
 ## About FSA-RN
