@@ -5,7 +5,13 @@
 Tooling and specification to support the generation of Reference Numbers in particular for Food Business Establishment Registration.
 
 ### The purpose
-The specification and tool is to be used by the Food Standards Agency (FSA) or Local Authorities and their suppliers in providing standardised reference numbers.  These reference numbers would be stored in data and provided as a reference number in a digital service at the point of creation.   
+The specification provides a standard for the provision of reference numbers.  This would apply to:
+- the Food Standards Agency (FSA)
+- Local Authorities (that a Food Business Registers with)
+- Management Information Systems (MIS) and other Suppliers to Local Authorities  
+- Suppliers to the Food Standards Agency
+
+The specification is implimented with specific code that can be run as part of a digital service within one or more of those organisations. The reference numbers provided would be stored in data and provided as a reference number in a digital service at the point of creation.   
 
 ### Current development phase
 This is in the **Alpha phase** of development.  We use the alpha phase to: build prototypes of our services, test with users and in this case third-party suppliers and to show services are technically possible.
