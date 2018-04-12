@@ -1,4 +1,12 @@
-package com.epimorphics.fsa.rn;
+/*******************************************************************************
+ * File:        Instance.java
+ * Created by:  Stuart Williams (skw@epimorphics.com)
+ * Created on:  10 Apr 2018
+ *
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
+ *
+ ******************************************************************************/
+package uk.gov.food.rn;
 
 /**
  * Encapsulates the concept of a deployment instance, denoting 
@@ -24,9 +32,9 @@ public class Instance {
      * Construct a new instance object with the given identifier.
      *
      * @param instanceId The identity of the instance (relative to an authority).
-     * @throws RNException if the identifier is not valid
+     * 
      */
-    public Instance(int instanceId) throws RNException {
+    public Instance(int instanceId) {
         if (!isValidIdentifier(instanceId))  {
             throw new RNException(
                 String.format("Illegal identifier for instance: %d is not in the range %d : %d",
@@ -41,9 +49,9 @@ public class Instance {
      * Construct a new instance object from a string denoting the instance identifier
      *
      * @param instanceIdEnc The identity of the instance as a string (relative to an authority).
-     * @throws RNException if the identifier is not valid
+     * 
      */
-    public Instance(String instanceIdEnc) throws RNException {
+    public Instance(String instanceIdEnc) {
         this(Integer.parseInt(instanceIdEnc));
     }
 

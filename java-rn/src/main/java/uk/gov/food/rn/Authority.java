@@ -1,4 +1,12 @@
-package com.epimorphics.fsa.rn;
+/*******************************************************************************
+ * File:        Authority.java
+ * Created by:  Ian Dickinson (ian.dickinson@epimorphics.com)
+ * Created on:  10 Apr 2018
+ *
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
+ *
+ ******************************************************************************/
+package uk.gov.food.rn;
 
 /**
  * Encapsulates the concept of an authority, denoting the Local
@@ -19,9 +27,9 @@ public class Authority {
      * Construct a new authority object with the given identifier.
      *
      * @param authorityId The identity of the authority
-     * @throws RNException if the identifier is not valid
+     *
      */
-    public Authority(int authorityId) throws RNException {
+    public Authority(int authorityId) {
         if (!isValidIdentifier(authorityId))  {
             throw new RNException(
                 String.format("Illegal identifier for authority: %d is not in the range %d : %d",
@@ -36,9 +44,9 @@ public class Authority {
      * Construct a new authority object from a string denoting the authority identifier
      *
      * @param authorityIdEnc The identity of the authority as a string
-     * @throws RNException if the identifier is not valid
+     *
      */
-    public Authority(String authorityIdEnc) throws RNException {
+    public Authority(String authorityIdEnc) {
         this(Integer.parseInt(authorityIdEnc));
     }
 

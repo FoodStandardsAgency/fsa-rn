@@ -1,4 +1,12 @@
-package com.epimorphics.fsa.rn;
+/*******************************************************************************
+ * File:        TimeStampTest.java
+ * Created by:  Stuart Williams (skw@epimorphics.com)
+ * Created on:  10 Apr 2018
+ *
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
+ *
+ ******************************************************************************/
+package uk.gov.food.rn;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +15,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import org.junit.Test;
+
+import uk.gov.food.rn.RNException;
+import uk.gov.food.rn.TimeStamp;
 
 /**
  * Unit tests on {@link TimeStamp}
@@ -45,8 +56,8 @@ public class TimeStampTest {
         try {
             assertNotNull(new TimeStamp(ZonedDateTime.of(1999,01,01,00,00,00,0,ZoneOffset.UTC)));
             fail("should not be permitted");
-        }
-        catch (RNException e) {
+        } catch (RNException e) {
+        	//Expected outcome.
         }
     }
 

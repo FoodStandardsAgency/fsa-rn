@@ -3,43 +3,13 @@
  * Created by:  Stuart Williams (skw@epimorphics.com)
  * Created on:  10 Apr 2018
  * 
- * Copyright (C) 2018 Food Standards Agency
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
  *
  *****************************************************************/
-package com.epimorphics.fsa.rn;
+package uk.gov.food.rn;
 
 import java.math.BigInteger;
-import java.time.DateTimeException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
 
-	/**
-	 * @author skw
-	 *
-	 */
 	public class Codec {
 
 	    private static final long serialVersionUID = 2490953697826083512L;
@@ -87,9 +57,9 @@ import java.util.regex.Pattern;
 	     *
 	     * @param i	A BigInteger to be encoded
 	     * @return  A String carrying the base 33 serialized form.
-	     * @throws RNException 
+	     * 
 	     */
-	    public static String encode(BigInteger i) throws RNException {
+	    public static String encode(BigInteger i) {
 	        // cc = prime - ((i*residual) mod prime)
 	        BigInteger cc = prime.subtract(i.multiply(residual).mod(prime)) ;
 	        // i = i*base^2 + cc
@@ -107,9 +77,9 @@ import java.util.regex.Pattern;
 	     *
 	     * @param i BigInteger value to be base 33 encoded.
 	     * @return  Base 33 serialised form of the given integer.
-	     * @throws RNException 
+	     * 
 	     */
-	    private static String raw_encode(BigInteger i) throws RNException {
+	    private static String raw_encode(BigInteger i) {
 	    	//Range check
 	    	if(i.compareTo(BigInteger.ZERO)<0) 
               	throw new RNException(String.format("Negative values no allowed: %d", i));
@@ -145,9 +115,9 @@ import java.util.regex.Pattern;
 		 * 
 		 * @param i_b33
 		 * @return
-		 * @throws RNException
+		 * 
 		 */
-		public static BigInteger decode(String i_b33) throws RNException {
+		public static BigInteger decode(String i_b33) {
 	    	BigInteger i = raw_decode(i_b33);
 	    	if(isValid(i)) {
 	    		return i.divide(baseSquared);
@@ -162,9 +132,9 @@ import java.util.regex.Pattern;
 	     *
 	     * @param i_b33 Base 33 encoded string
 	     * @return  
-	     * @throws RNException
+	     * 
 	     */
-	    private static BigInteger raw_decode(String i_b33) throws RNException {
+	    private static BigInteger raw_decode(String i_b33)  {
 	        BigInteger res = BigInteger.ZERO;
 
 	        if (!i_b33.matches("["+alphabet+" -]+")) {
