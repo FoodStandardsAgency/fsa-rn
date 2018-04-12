@@ -1,8 +1,19 @@
-package com.epimorphics.fsa.rn;
+/*******************************************************************************
+ * File:        InstanceTest.java
+ * Created by:  Stuart Williams (skw@epimorphics.com)
+ * Created on:  10 Apr 2018
+ *
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
+ *
+ ******************************************************************************/
+package uk.gov.food.rn;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import uk.gov.food.rn.Instance;
+import uk.gov.food.rn.RNException;
 
 /**
  * Unit tests on {@link Instance}

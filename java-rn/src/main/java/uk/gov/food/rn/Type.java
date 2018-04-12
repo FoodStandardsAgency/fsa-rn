@@ -1,4 +1,12 @@
-package com.epimorphics.fsa.rn;
+/*******************************************************************************
+ * File:        Type.java
+ * Created by:  Stuart Williams (skw@epimorphics.com)
+ * Created on:  10 Apr 2018
+ *
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
+ *
+ ******************************************************************************/
+package uk.gov.food.rn;
 
 /**
  * Encapsulates the concept of a reference number(RN) type.
@@ -22,9 +30,9 @@ public class Type {
      * Construct a new Type object with the given identifier.
      *
      * @param typeId The identity of the Type
-     * @throws RNException if the identifier is not valid
+     * 
      */
-    public Type(int typeId) throws RNException {
+    public Type(int typeId) {
         if (!isValidIdentifier(typeId))  {
             throw new RNException(
                 String.format("Illegal identifier for type: %d is not in the range %d : %d",
@@ -39,9 +47,9 @@ public class Type {
      * Construct a new Type object from a string denoting the type identifier
      *
      * @param typeIdEnc The identity of the Type as a string
-     * @throws RNException if the identifier is not valid
+     * 
      */
-    public Type(String typeIdEnc) throws RNException {
+    public Type(String typeIdEnc) {
         this(Integer.parseInt(typeIdEnc));
     }
 

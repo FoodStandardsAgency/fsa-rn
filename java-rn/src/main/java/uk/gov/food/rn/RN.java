@@ -3,36 +3,15 @@
  * Created by:  Stuart Williams (skw@epimorphics.com)
  * Created on:  5 Apr 2018
  *
- * Copyright (C) 2018 Food Standards Agency
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
  *
  ******************************************************************************/
-package com.epimorphics.fsa.rn;
+package uk.gov.food.rn;
 
 import java.math.BigInteger;
-import java.time.DateTimeException;
-import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
-import com.epimorphics.fsa.rn.TimeStamp;
 
 
 public class RN implements Comparable<RN> {
@@ -86,9 +65,9 @@ public class RN implements Comparable<RN> {
      * @param instance  issuing service instance
      * @param type      reference number type
      * @param instant   time instant when issued
-     * @throws RNException
+     * 
      */
-    RN(Authority authority, Instance instance, Type type, ZonedDateTime instant) throws RNException {
+    RN(Authority authority, Instance instance, Type type, ZonedDateTime instant) {
     	this.authority = authority;
     	this.instance  = instance;
     	this.type      = type;
@@ -101,10 +80,10 @@ public class RN implements Comparable<RN> {
      * May throw an RNException if any of the embedded field values are outside their permitted ranges.
      *
      * @param decimalForm    A decimal form integer
-     * @throws RNException
+     * 
      */
 
-    protected RN(BigInteger i) throws RNException {
+    protected RN(BigInteger i)  {
         parseDecimalForm(i);
         rn_int = i;
     }
@@ -116,9 +95,9 @@ public class RN implements Comparable<RN> {
      *  May throw an RNException if an if the embedded field values are outside their permitted ranges.
      * 
      * @param  encodedForm
-     * @throws RNException
+     * 
      */
-    protected RN(String encodedForm) throws RNException  {
+    protected RN(String encodedForm)  {
     	rn_int = Codec.decode(encodedForm);
         parseDecimalForm(rn_int);    	
     }
@@ -130,7 +109,7 @@ public class RN implements Comparable<RN> {
      * @param decimal The decimal value to be parsed.
      * 
      */
-    private void parseDecimalForm(BigInteger decimal) throws RNException {
+    private void parseDecimalForm(BigInteger decimal) {
         String i = String.format("%024d", decimal);
         if( i.length()!=24) {
             throw new RNException("Bad Decimal form (incorrect length): "+ i);
@@ -155,12 +134,7 @@ public class RN implements Comparable<RN> {
         instance  = new Instance(i.substring(7,8));
         authority = new Authority(i.substring(3,7));
         int milli = Integer.parseInt(i.substring(0,3));
-
-        try {
-            timestamp = new TimeStamp( ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC) );
-        } catch (DateTimeException e) {
-            throw new RNException("Bad Decimal form (illegal date): "+i,  e);
-        }
+        timestamp = new TimeStamp( ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC) );
     }
 
     /**
@@ -171,12 +145,7 @@ public class RN implements Comparable<RN> {
     public String getEncodedForm() {
     	if(rn_str == null) {
     		rn_int = new BigInteger(getDecimalForm());
-    		try {
-				rn_str = Codec.encode(rn_int);
-			} catch (RNException e) {
-				// Should never happen
-				rn_str = null; 
-			}
+    		rn_str = Codec.encode(rn_int);
     	}
         return rn_str;
     }

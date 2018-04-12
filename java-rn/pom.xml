@@ -1,18 +1,9 @@
 <!--
-    File:        ${file_name}   
-    Created by:  ${user:git_config(user.name)} (${email:git_config(user.email)})
-    Created on:  2018
-      
-    (c) Copyright ${year}, Food Standards Agency
-      
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
-     
+  File:        pom.xml
+  Created by:  Stuart Williams (skw@epimorphics.com)
+  Created on:  4 Apr 2018
+ 
+  Copyright (c) 2018 Crown Copyright (Food Standards Agency)    
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
