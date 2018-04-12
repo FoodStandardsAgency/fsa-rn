@@ -26,7 +26,7 @@
  ******************************************************************************/
 package com.epimorphics.fsa.rn;
 
-public class RNException extends Exception
+public class RNException extends RuntimeException
 {
 	/**
 	 * 
