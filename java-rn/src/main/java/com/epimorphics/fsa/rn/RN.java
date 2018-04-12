@@ -76,6 +76,13 @@ public class RN implements Comparable<RN> {
         return getEncodedForm();
     }
     
+    public BigInteger getValue() {
+    	if (rn_int == null) {
+    		// TODO this is a hack, fix me!
+    		getEncodedForm();
+    	}
+    	return rn_int;
+    }
     
     /**
      * Construct an RN form its constituent parts.
