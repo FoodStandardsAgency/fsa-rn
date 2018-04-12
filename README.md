@@ -1,5 +1,7 @@
-<a href="https://github.com/FoodStandardsAgency/fsa-rn/wiki/images/alpha-banner.png"><img src="https://github.com/FoodStandardsAgency/fsa-rn/wiki/images/alpha-banner.png"
-alt="ALPHA" width="70" height="20" border="0" /></a>
+<a href="http://data.food.gov.uk/codes/ui/assets/images/logo.png"><img src="http://data.food.gov.uk/codes/ui/assets/images/logo.png" alt="FSA Logo" border="0" /></a>
+
+<a href="images/alpha-banner.png"><img src="images/alpha-banner.png"
+alt="ALPHA" width="70" height="20" border="0" /></a>  This is code is under development – your feedback will help us to improve it.
 
 # Reference Number Generation tooling (fsa-rn)
 
