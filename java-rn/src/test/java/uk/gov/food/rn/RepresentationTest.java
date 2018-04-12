@@ -1,4 +1,4 @@
-package com.epimorphics.fsa.rn;
+package uk.gov.food.rn;
 
 import static org.junit.Assert.*;
 
@@ -8,6 +8,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import org.junit.Test;
+
+import uk.gov.food.rn.Representation;
 
 /**
  * Unit tests on the {@link Representation} class

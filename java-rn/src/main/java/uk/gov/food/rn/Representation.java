@@ -1,4 +1,4 @@
-package com.epimorphics.fsa.rn;
+package uk.gov.food.rn;
 
 import java.math.BigInteger;
 import java.util.regex.Matcher;
