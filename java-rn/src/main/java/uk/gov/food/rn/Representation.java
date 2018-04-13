@@ -19,11 +19,11 @@ public class Representation {
     /** The BASE, squared */
     public static final BigInteger BASE_SQUARED = BASE.multiply(BASE);
 
-    /** The largest prime number that is smaller than BASE^2 */
-    public static final BigInteger BASE2_PRIME = BigInteger.valueOf(1087);
+    /** The largest prime number that is smaller than BASE^2, used in check digits calculation */
+    public static final BigInteger CHECK_DIGITS_PRIME = BigInteger.valueOf(1087);
 
-    /** The difference between BASE^2 and BASE2_PRIME */
-    public static final BigInteger BASE2_RESIDUAL = BASE_SQUARED.subtract(BASE2_PRIME);
+    /** The difference between BASE^2 and CHECK_DIGITS_PRIME, used to calculate check digits more effciiently */
+    public static final BigInteger CHECK_DIGITS_RESIDUAL = BASE_SQUARED.subtract(CHECK_DIGITS_PRIME);
 
     /** The size of groups of digits in the encoded form */
     public static final int GROUP_SIZE = 6;
@@ -116,7 +116,7 @@ public class Representation {
      *  Recovering NN: NN = checked_NN / base^2
      */
     protected BigInteger withCheckDigits(BigInteger nn) {
-        BigInteger cc = BASE2_PRIME.subtract(nn.multiply(BASE2_RESIDUAL).mod(BASE2_PRIME)) ;
+        BigInteger cc = CHECK_DIGITS_PRIME.subtract(nn.multiply(CHECK_DIGITS_RESIDUAL).mod(CHECK_DIGITS_PRIME)) ;
 
         return nn.multiply(BASE_SQUARED).add(cc);
     }
@@ -223,7 +223,7 @@ public class Representation {
      * @throws RNException if the check digits are not correct
      */
     protected BigInteger checkCheckDigits(BigInteger cc) {
-        if (cc.mod(BASE2_PRIME).equals(BigInteger.ZERO)) {
+        if (cc.mod(CHECK_DIGITS_PRIME).equals(BigInteger.ZERO)) {
             return cc.divide(BASE_SQUARED);
         }
         else {
