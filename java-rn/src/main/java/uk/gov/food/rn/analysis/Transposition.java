@@ -8,7 +8,15 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
+/**
+ * A small program that explores the error detection characteristics of the FSA-RN (mod 1087) check digit scheme.
+ * 
+ *   In particular this program:
+ *   
+ *    - evaluates the number of detectable independent double digit transcription errors
+ *    - demonstrates that the scheme detects all ded->ede transposition errors
+ *    - the patterns of bit positions vulnerable to multiple consistent miss-transcription of the same digit 
+ */
 public class Transposition {
 	static int i_base  = 33;
 	static int i_prime = 1087; 
@@ -28,8 +36,26 @@ public class Transposition {
 		singleDedEdeTranspositions();
 		multiSingleDigitTransciption();
 	}
+	
+	/**
+	 * Set up the array of weights for evaluating compact of digit errors on (mod p) digit check.
+	 * 
+	 *  W_n = (base^n mod p)
+	 */
+	private static void initWeights() {
+		for(int i=0; i<digits ;i++) {
+			weights.add(base.pow(i).mod(prime).intValue());
+		}
+		
+		System.out.println("Weights: "+ weights );
+	}
 
 	/**
+	 * Double independent double digit transcription errors
+	 * 
+	 * Exhaustive search for all the cases that leave the change undetectable
+	 * 
+	 * (d'_i - d_i)W_i + (d'_j - _j)W_j = 0 mod p
 	 * 
 	 */
 	private static void independentDoubleTranscriptions() {
@@ -64,19 +90,14 @@ public class Transposition {
 				            +trials+" trials."  );
 	}
 
-	/**
-	 * 
-	 */
-	private static void initWeights() {
-		for(int i=0; i<digits ;i++) {
-			weights.add(base.pow(i).mod(prime).intValue());
-		}
-		
-		System.out.println("Weights: "+ weights );
-	}
 
 	/**
-	 * @param weights
+	 *  DED->EDE digit trans-positions 
+	 *  
+	 * Look for sequences of weights that will make the change undetectable: 
+	 *  
+	 *  (d_i+1 - d_i)(W_i+1 - W_i + W_i-1) mod p = 0
+	 * 
 	 */
 	private static void singleDedEdeTranspositions() {
 		boolean ded_ede = false;
@@ -95,7 +116,8 @@ public class Transposition {
 	 * 
 	 */
 	private static void multiSingleDigitTransciption() {
-		/* Look for sets of indices that sum to our prime base (1087)
+		/**
+		 * Look for sets of indices that sum to our prime base (1087)
 		 * 
 		 * For multiple occurences of the same single digit transcription error
 		 * 
