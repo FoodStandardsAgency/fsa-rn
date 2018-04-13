@@ -1,11 +1,7 @@
-/*******************************************************************************
- * File:        TypeTest.java
- * Created by:  Stuart Williams (skw@epimorphics.com)
- * Created on:  10 Apr 2018
- *
+/*****************************************************************************
  * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
- *
- ******************************************************************************/
+ * See LICENCE
+******************************************************************************/
 package uk.gov.food.rn;
 
 import static org.junit.Assert.*;

@@ -1,5 +1,7 @@
-/* Copyright (c) 2018 Crown Copyright (Food Standards Agency) */
-
+/*****************************************************************************
+ * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
+ * See LICENCE
+******************************************************************************/
 package uk.gov.food.rn;
 
 import java.math.BigInteger;

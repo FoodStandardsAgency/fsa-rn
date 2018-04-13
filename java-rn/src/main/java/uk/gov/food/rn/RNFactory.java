@@ -1,11 +1,7 @@
-/******************************************************************
- * File:        RNFactory.java
- * Created by:  Stuart Williams (skw@epimorphics.com)
- * Created on:  3 Apr 2018
- *
+/*****************************************************************************
  * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
- *
- *****************************************************************/
+ * See LICENCE
+******************************************************************************/
 package uk.gov.food.rn;
 
 import java.time.Instant;
@@ -90,9 +86,9 @@ public class RNFactory  {
 
     }
 
-    /** @@TODO Factor this main out into some JUnit tests */
-
-    public static void main(String[] args) {
+//    /** @@TODO Factor this main out into some JUnit tests */
+//
+//    public static void main(String[] args) {
 //		// Make factory
 //		RNFactory rnf = null;
 //		RNFactory rnf2 = null;
@@ -115,8 +111,8 @@ public class RNFactory  {
 //		// Print them out in various forms.
 //		for(int i = 0; i<100; i++) {
 //		   System.out.println( arr[i].getEncodedForm() +
-//				         " " + arr[i].getDecimalForm()+
-//				         " " + arr[i].getDecodedDecimalForm()
+//				         " " + arr[i].getValue()+
+//				         " " + arr[i].toDebugString()
 //		   );
 //		}
 //
@@ -131,11 +127,11 @@ public class RNFactory  {
 //
 //			RN rn;
 //			try {
-//				rn = new RN(Codec.decode(ef));
-//				System.out.println(rn.getEncodedForm()+" "+rn.getDecimalForm()+" "+rn.getDecodedDecimalForm());
+//				rn = new RN(ef);
+//				System.out.println(rn.getEncodedForm()+" "+rn.getValue()+" "+rn.toDebugString());
 //			} catch (RNException e) {
 //			    System.out.println(e.getMessage());
 //			}
 //		}
-    }
+//    }
 }

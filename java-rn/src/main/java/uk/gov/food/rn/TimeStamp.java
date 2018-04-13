@@ -1,11 +1,7 @@
-/******************************************************************
- * File:        TimeStamp.java   
- * Created by:  Stuart Williams (skw@epimorphics.com)
- * Created on:  9 Apr 2018
- * 
+/*****************************************************************************
  * Copyright (c) 2018 Crown Copyright (Food Standards Agency)
- *
- *****************************************************************/
+ * See LICENCE
+******************************************************************************/
 package uk.gov.food.rn;
 
 import java.time.ZoneOffset;
