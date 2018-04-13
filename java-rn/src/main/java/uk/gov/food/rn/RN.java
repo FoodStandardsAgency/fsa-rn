@@ -146,14 +146,18 @@ public class RN implements Comparable<RN> {
      *
      * @return
      */
-    public String toString() {
+    public String toDebugString() {
         return String.format("%04d:%01d:%02d:%s",
-                                 getAuthority().getId(),
+                              getAuthority().getId(),
                               getInstance().getId(),
                               getType().getId(),
                               timestamp.getInstant());
     }
 
+    @Override
+    public String toString() {
+        return getEncodedForm();
+    }
 
     @Override
     public boolean equals (Object other) {

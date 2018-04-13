@@ -63,7 +63,13 @@ public class RNTest
     @Test
     public void itShouldGenerateAHumanReadbleFormForDebugging() {
         RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
-        assertEquals("1234:5:06:2018-04-12T12:34:51.468Z", rn.toString());
+        assertEquals("1234:5:06:2018-04-12T12:34:51.468Z", rn.toDebugString());
+    }
+
+    @Test
+    public void itShouldTheTransportFormByDefault() {
+        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
+        assertEquals("H31DEZ-JCCB4T-XYPZ8S", rn.toString());
     }
 
     /** Note: this test has been updated due to the choice
