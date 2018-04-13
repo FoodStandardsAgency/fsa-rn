@@ -179,11 +179,26 @@ public class RN implements Comparable<RN> {
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      *
-     * Order by comparing internal values
+     * Order by comparing internal values, arranged so that reference numbers with
+     * similar values will group together in sorted collections.
      */
     @Override
     public int compareTo(RN other){
-        return getValue().compareTo(other.getValue());
+        int comparison = getAuthority().getId() - other.getAuthority().getId();
+
+        if (comparison == 0) {
+            comparison = getInstance().getId() - other.getInstance().getId();
+        }
+
+        if (comparison == 0) {
+            comparison = getType().getId() - other.getType().getId();
+        }
+
+        if (comparison == 0) {
+            comparison = getInstant().getInstant().compareTo(other.getInstant().getInstant());
+        }
+
+        return comparison;
     }
 
     /**
