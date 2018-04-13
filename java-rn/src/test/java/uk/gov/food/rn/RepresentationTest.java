@@ -50,15 +50,17 @@ public class RepresentationTest {
         assertTrue(i.compareTo(rn.getValue()) > 0);
     }
 
+    /** Note: this test has been updated due to the choice
+     * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldEncodeAValueUsingTheAlpabet() {
         RN rn = fixture();
         Representation r = new Representation(rn);
 
-        assertEquals("000000000000000000", r.alphabetEncode(BigInteger.valueOf(0)));
-        assertEquals("00000000000000000Z", r.alphabetEncode(BigInteger.valueOf(32)));
-        assertEquals("000000000000000010", r.alphabetEncode(BigInteger.valueOf(33)));
-        assertEquals("000000000000000011", r.alphabetEncode(BigInteger.valueOf(34)));
+        assertEquals("AAAAAAAAAAAAAAAAAA", r.alphabetEncode(BigInteger.valueOf(0)));
+        assertEquals("AAAAAAAAAAAAAAAAA9", r.alphabetEncode(BigInteger.valueOf(32)));
+        assertEquals("AAAAAAAAAAAAAAAABA", r.alphabetEncode(BigInteger.valueOf(33)));
+        assertEquals("AAAAAAAAAAAAAAAABB", r.alphabetEncode(BigInteger.valueOf(34)));
     }
 
     @Test
@@ -74,12 +76,14 @@ public class RepresentationTest {
         assertEquals("012345-6789AB-C", r.groupDigits("0123456789ABC", 6));
     }
 
+    /** Note: this test has been updated due to the choice
+     * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldEncodeAReferenceNumber() {
         RN rn = fixture();
         Representation r = new Representation(rn);
 
-        assertEquals("4PVXH9-7FA1EK-PD1ZZC", r.getEncodedForm());
+        assertEquals("E057TK-HRLBQW-0PB99N", r.getEncodedForm());
     }
 
     @Test
@@ -94,14 +98,16 @@ public class RepresentationTest {
         }
     }
 
+    /** Note: this test has been updated due to the choice
+     * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldDecodeAnEncodedNumberToDecimal() {
         RN rn = fixture();
         Representation r = new Representation(rn);
 
-        assertEquals(BigInteger.valueOf(9), r.decodeDecimal("9"));
-        assertEquals(BigInteger.valueOf(10), r.decodeDecimal("A"));
-        assertEquals(BigInteger.valueOf(33), r.decodeDecimal("10"));
+        assertEquals(BigInteger.valueOf(32), r.decodeDecimal("9"));
+        assertEquals(BigInteger.valueOf(0), r.decodeDecimal("A"));
+        assertEquals(BigInteger.valueOf(815), r.decodeDecimal("10"));
     }
 
     @Test
@@ -144,20 +150,22 @@ public class RepresentationTest {
         assertEquals(rn, r1.getReferenceNumber());
     }
 
+    /** Note: this test has been updated due to the choice
+     * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldCatchDamagedEncodings() {
         RN rn = fixture();
         Representation r = new Representation(rn);
 
         String s = r.getEncodedForm();
-        String sDamaged = s.replaceAll("1", "0");
+        String sDamaged = s.replaceAll("B", "0");
 
         try {
             new Representation(sDamaged);
             fail("Should be rejected");
         }
         catch (RNException e) {
-            assertEquals("Value '308321437725375062405836992' does not have intact check digits", e.getMessage());
+            assertEquals("Value '308321437725407409804883086' does not have intact check digits", e.getMessage());
         }
     }
 

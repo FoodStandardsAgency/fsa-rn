@@ -40,9 +40,11 @@ public class RNTest
         assertEquals(timestampFixture(), rn.getInstant().getInstant());
     }
 
+    /** Note: this test has been updated due to the choice
+     * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldConstructAnRNFromAnEncodedNumber() {
-        RN rn = new RN("7SQ34N-8221TH-LMDNYG");
+        RN rn = new RN("H31DEZ-JCCB4T-XYPZ8S");
 
         assertEquals(1234, rn.getAuthority().getId());
         assertEquals(5, rn.getInstance().getId());
@@ -50,10 +52,12 @@ public class RNTest
         assertEquals(timestampFixture(), rn.getInstant().getInstant());
     }
 
+    /** Note: this test has been updated due to the choice
+     * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldEncodeAReferenceNumberToExternalForm() {
         RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
-        assertEquals("7SQ34N-8221TH-LMDNYG", rn.getEncodedForm());
+        assertEquals("H31DEZ-JCCB4T-XYPZ8S", rn.getEncodedForm());
     }
 
     @Test
@@ -62,6 +66,8 @@ public class RNTest
         assertEquals("1234:5:06:2018-04-12T12:34:51.468Z", rn.toString());
     }
 
+    /** Note: this test has been updated due to the choice
+     * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldDetectWhenAnExternalFormIsCorrupted() {
         try {
@@ -72,7 +78,7 @@ public class RNTest
             fail("Should raise exception");
         }
         catch (RNException e) {
-            assertEquals("Value '509906315616374199643526092' does not have intact check digits", e.getMessage());
+            assertEquals("Value '1990860868133564010724342527' does not have intact check digits", e.getMessage());
         }
     }
 

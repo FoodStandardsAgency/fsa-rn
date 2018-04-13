@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public class Representation {
     /** The set of characters that are permitted for encoding an RN */
-    public static final String ALPHABET = "0123456789ABCDEFGHJKLMNPQRSTVWXYZ";
+    public static final String ALPHABET = "ABCDEFGHJKLMNPQRSTVWXYZ0123456789";
 
     /** The numerical base for RNs encoded in the ALPHABET */
     public static final BigInteger BASE = BigInteger.valueOf(ALPHABET.length());
