@@ -7,6 +7,7 @@ package uk.gov.food.rn;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -16,8 +17,28 @@ public class RNFactory  {
     private final Type      type       ;
     private long  prev = 0 ;
 
+    /**
+	 * @return the authority
+	 */
+	public Authority getAuthority() {
+		return authority;
+	}
 
-    public boolean equals(RNFactory other) {
+	/**
+	 * @return the instance
+	 */
+	public Instance getInstance() {
+		return instance;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public Type getType() {
+		return type;
+	}
+
+	public boolean equals(RNFactory other) {
         return authority.equals(other.authority) &&
                instance.equals(other.instance) &&
                type.equals(other.type);
@@ -25,21 +46,28 @@ public class RNFactory  {
 
     @Override
     public int hashCode() {
-        int res = authority.getId();
-        res     = instance.getId() + res*(Instance.MAX_INSTANCE_ID+1);
-        res     = type.getId()     + res*(Type.MAX_TYPE_ID+1);
-        return res;
+      return Arrays.hashCode(new Object[] { authority, instance, type });
     }
 
-    /*
+    /**
      *  Use a Map to ensure there is a single factory instance for each authority,instance and type combination
      *  within the same JVM.
-     *
      */
-
     private static HashMap<Integer,RNFactory> factories = new HashMap<Integer,RNFactory>() ;
 
-    public static RNFactory getFactory(Authority authority, Instance instance, Type type) throws RNException {
+    
+    /**
+     * Get or create an RNFactory for generating RNs for a given Authority, Instance and Type.
+     * 
+     * Return an (the) existing factory if one exists, otherwise attempt to make one, then register and return that.
+     *  
+     * @param authority
+     * @param instance
+     * @param type
+     * @return
+     *
+     */
+    public static RNFactory getFactory(Authority authority, Instance instance, Type type) {
         RNFactory res = new RNFactory(authority, instance, type);
 
         synchronized (factories) {
@@ -49,16 +77,36 @@ public class RNFactory  {
                 factories.put(res.hashCode(), res);
             }
         }
-
         return res;
     }
 
+    /**
+     * Private constructor use to create RNF factories when required. 
+     * 
+     * @param authority
+     * @param instance
+     * @param type
+     */
     private RNFactory(Authority authority, Instance instance, Type type) {
         this.authority = authority;
         this.instance  = instance;
         this.type      = type;
     }
 
+    /**
+     * Generates a fresh {@link RN}, pausing for 1ms if less than 1ms has elasped since the factory
+     * generated the immediately previous RN. This is to ensure that generated RN are unque.
+     * 
+     * At present there is NO mechanism in place to ensure that there at most one instance of factory
+     * for a given {@link Authority),{@link Instance},{@link Type} combination on a given hardware platform, 
+     * only within the same JVM.
+     * 
+     * There is a need for some external mechanism to ensure for example that simple command line tools running in
+     * shell scripts safely create factories. This may rely on some OS IPC mechanism, or possibly a convention for
+     * obtaining and exclusive lock on a file for the life time of the given factory object.
+     * 
+     * @return a fresh unique {@link RN}
+     */
     public RN generateReferenceNumber() {
         // Make sure at least one millisecond has elapse since the last reference number was generated
         long time = 0;
