@@ -231,7 +231,7 @@ public class Representation {
             return cc.divide(BASE_SQUARED);
         }
         else {
-            throw new RNException(String.format("Value '%s' does not have intact check digits", cc));
+            throw new RNException(String.format("Value '%s' does not have intact check digits", groupDigits(alphabetEncode(cc),GROUP_SIZE)));
         }
     }
 }
