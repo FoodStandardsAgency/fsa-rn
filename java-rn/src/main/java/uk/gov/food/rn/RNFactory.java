@@ -4,6 +4,8 @@
 ******************************************************************************/
 package uk.gov.food.rn;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -12,10 +14,15 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class RNFactory  {
+	
+	static private String LOCK_DIRECTORY = "/var/fsa-rn/locks";
+	
     private final Authority authority  ;
     private final Instance  instance   ;
     private final Type      type       ;
     private long  prev = 0 ;
+    
+    private LockFile lockFile  = null;
 
     /**
 	 * @return the authority
@@ -46,7 +53,11 @@ public class RNFactory  {
 
     @Override
     public int hashCode() {
-      return Arrays.hashCode(new Object[] { authority, instance, type });
+      return hashKey(authority, instance, type);
+    }
+    
+    private static int hashKey(Authority authority, Instance instance, Type type) {
+        return Arrays.hashCode(new Object[] { authority, instance, type });    	
     }
 
     /**
@@ -68,13 +79,14 @@ public class RNFactory  {
      *
      */
     public static RNFactory getFactory(Authority authority, Instance instance, Type type) {
-        RNFactory res = new RNFactory(authority, instance, type);
-
+    	RNFactory res;
+    	int hashKey = hashKey(authority, instance, type);
         synchronized (factories) {
-            if (factories.containsKey(res.hashCode())) {
-                res = factories.get(res.hashCode());
+            if (factories.containsKey(hashKey)) {
+                res = factories.get(hashKey);
             } else {
-                factories.put(res.hashCode(), res);
+                res = new RNFactory(authority, instance, type);
+                factories.put(hashKey, res);
             }
         }
         return res;
@@ -91,6 +103,21 @@ public class RNFactory  {
         this.authority = authority;
         this.instance  = instance;
         this.type      = type;
+        
+        // Create an external (to JVM) lock file to avoid duplicate instances on this platform.
+        lockFile = new LockFile(LOCK_DIRECTORY, 
+        						String.format("factory-%04d-%01d-%02d.lock",
+        									   authority.getId(),
+        									   instance.getId(),
+        									   type.getId()
+        										));
+        try {
+        	boolean locked = lockFile.lock();
+        	if(!locked)
+            	throw new RNException(String.format("Can't lock factory lock file \"%s\". Another instance of the same RN generator is probably running on this platform", lockFile.getName() ));
+        } catch (IOException e) {
+        	throw new RNException("IOException while trying to get factory lock", e);
+        }
     }
 
     /**
@@ -134,52 +161,52 @@ public class RNFactory  {
 
     }
 
-//    /** @@TODO Factor this main out into some JUnit tests */
-//
-//    public static void main(String[] args) {
-//		// Make factory
-//		RNFactory rnf = null;
-//		RNFactory rnf2 = null;
-//
-//		rnf =  RNFactory.getFactory(new Authority(1000), new Instance(1), new Type(21)) ;
-//		rnf2 = RNFactory.getFactory(new Authority(1000), new Instance(1), new Type(21)) ;
-//
-//		if(rnf.equals(rnf2) && rnf != rnf2) {
-//			System.out.println("RNFs are strangely different");
-//		}
-//
-//		// Generate some RN's
-//		RN [] arr = new RN[100];
-//		for (int i = 0; i < 99; i++) {
-//			arr[i] = rnf.generateReferenceNumber();
-//		}
-//
-//     	arr[99] = new RN( new BigInteger("999999999999991231235959"));
-//
-//		// Print them out in various forms.
-//		for(int i = 0; i<100; i++) {
-//		   System.out.println( arr[i].getEncodedForm() +
-//				         " " + arr[i].getValue()+
-//				         " " + arr[i].toDebugString()
-//		   );
-//		}
-//
-//		System.out.println();
-//
-//		for(int i=0; i<100; i++) {
-//			String ef = arr[i].getEncodedForm();
-//
-//			// Break the encoded form
-//
-//			ef = ef.replaceAll("K","P");
-//
-//			RN rn;
-//			try {
-//				rn = new RN(ef);
-//				System.out.println(rn.getEncodedForm()+" "+rn.getValue()+" "+rn.toDebugString());
-//			} catch (RNException e) {
-//			    System.out.println(e.getMessage());
-//			}
-//		}
-//    }
+    /** @@TODO Factor this main out into some JUnit tests */
+
+    public static void main(String[] args) {
+		// Make factory
+		RNFactory rnf = null;
+		RNFactory rnf2 = null;
+
+		rnf =  RNFactory.getFactory(new Authority(1000), new Instance(1), new Type(21)) ;
+		rnf2 = RNFactory.getFactory(new Authority(1000), new Instance(1), new Type(21)) ;
+
+		if(rnf.equals(rnf2) && rnf != rnf2) {
+			System.out.println("RNFs are strangely different");
+		}
+
+		// Generate some RN's
+		RN [] arr = new RN[100];
+		for (int i = 0; i < 99; i++) {
+			arr[i] = rnf.generateReferenceNumber();
+		}
+
+     	arr[99] = new RN( new BigInteger("999999999999991231235959"));
+
+		// Print them out in various forms.
+		for(int i = 0; i<100; i++) {
+		   System.out.println( arr[i].getEncodedForm() +
+				         " " + arr[i].getValue()+
+				         " " + arr[i].toDebugString()
+		   );
+		}
+
+		System.out.println();
+
+		for(int i=0; i<100; i++) {
+			String ef = arr[i].getEncodedForm();
+
+			// Break the encoded form
+
+			ef = ef.replaceAll("K","P");
+
+			RN rn;
+			try {
+				rn = new RN(ef);
+				System.out.println(rn.getEncodedForm()+" "+rn.getValue()+" "+rn.toDebugString());
+			} catch (RNException e) {
+			    System.out.println(e.getMessage());
+			}
+		}
+    }
 }
