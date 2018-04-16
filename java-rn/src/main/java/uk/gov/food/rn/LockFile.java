@@ -44,7 +44,7 @@ public class LockFile extends File {
 		super(uri);
 	}
 	
-	public synchronized boolean lock() throws IOException {
+	public synchronized boolean obtain() throws IOException {
 		try {
 			if (lock == null) {
 				raf = new RandomAccessFile(this, "rws");

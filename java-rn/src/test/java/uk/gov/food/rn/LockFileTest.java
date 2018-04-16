@@ -33,7 +33,7 @@ public class LockFileTest {
 	public void checkBasicCreateLockUnlockDelete() {
 		LockFile lf = new LockFile(LOCK_DIRECTORY, LOCK_FILENAME);
 		try {
-			boolean locked =lf.lock();
+			boolean locked =lf.obtain();
 			assertTrue("lockfile should exist", (new File(LOCK_DIRECTORY, LOCK_FILENAME).exists()) );
 			assertTrue("should be locked",locked);
 			boolean unlocked = lf.release();
@@ -55,14 +55,14 @@ public class LockFileTest {
 		//Create the parent directories if necessary
 
 		try {
-			boolean locked =lf.lock();
+			boolean locked =lf.obtain();
 			assertTrue("lockfile should exist", (new File(LOCK_DIRECTORY, LOCK_FILENAME).exists()) );
 			assertTrue("should be locked",locked);
 			boolean unlocked = lf.release();
 			assertTrue("lockfile should still exist", (new File(LOCK_DIRECTORY, LOCK_FILENAME).exists()) );
 			assertTrue("should be unlocked",unlocked);
 
-			boolean relocked =lf.lock();
+			boolean relocked =lf.obtain();
 			assertTrue("lockfile should exist", (new File(LOCK_DIRECTORY, LOCK_FILENAME).exists()) );
 			assertTrue("should be locked",relocked);
 			boolean reunlocked = lf.release();
@@ -83,18 +83,18 @@ public class LockFileTest {
 		LockFile lf2 = new LockFile(LOCK_DIRECTORY, LOCK_FILENAME);
 		
 		try {
-			boolean locked =lf.lock();
+			boolean locked =lf.obtain();
 			assertTrue("lockfile should exist", (new File(LOCK_DIRECTORY, LOCK_FILENAME).exists()) );
 			assertTrue("should be locked",locked);
 			
-			boolean locked2 = lf2.lock();
+			boolean locked2 = lf2.obtain();
 			assertFalse("should be be able to get a second lock",locked2);
 			
 			boolean unlocked = lf.release();
 			assertTrue("lockfile should still exist", (new File(LOCK_DIRECTORY, LOCK_FILENAME).exists()) );
 			assertTrue("should be unlocked",unlocked);
 
-			boolean relocked =lf2.lock();
+			boolean relocked =lf2.obtain();
 			assertTrue("lockfile should exist", (new File(LOCK_DIRECTORY, LOCK_FILENAME).exists()) );
 			assertTrue("should be locked",relocked);
 

@@ -134,11 +134,11 @@ public class RNFactory {
         									   type.getId()
         										));
         try {
-        	boolean locked = lockFile.lock();
+        	boolean locked = lockFile.obtain();
         	if(!locked)
-            	throw new RNException(String.format("Can't lock factory lock file \"%s\". Another instance of the same RN generator is probably running on this platform", lockFile.getName() ));
+            	throw new RNException(String.format("Can't obtain factory lock file \"%s\". Another instance of the same RN generator is probably running on this platform", lockFile.getName() ));
         } catch (IOException e) {
-        	throw new RNException("IOException while trying to get factory lock", e);
+        	throw new RNException("IOException while trying to obtain factory lock", e);
         }
     }
 
