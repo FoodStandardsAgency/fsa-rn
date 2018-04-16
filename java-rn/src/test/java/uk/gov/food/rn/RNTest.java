@@ -86,7 +86,7 @@ public class RNTest
             fail("Should raise exception");
         }
         catch (RNException e) {
-            assertEquals("Value '1990860868133564010724342527' does not have intact check digits", e.getMessage());
+            assertEquals("Value '7SS34N-8221TH-LMDNYG' does not have intact check digits", e.getMessage());
         }
     }
 

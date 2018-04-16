@@ -139,7 +139,7 @@ public class RepresentationTest {
             fail("Should be rejected");
         }
         catch (RNException e) {
-            assertEquals("Value '859818' does not have intact check digits", e.getMessage());
+            assertEquals("Value 'AAAAAA-AAAAAA-AA07VD' does not have intact check digits", e.getMessage());
         }
     }
 
@@ -169,7 +169,7 @@ public class RepresentationTest {
             fail("Should be rejected");
         }
         catch (RNException e) {
-            assertEquals("Value '308321437725407409804883086' does not have intact check digits", e.getMessage());
+            assertEquals("Value 'E057TK-HRL0QW-0P099N' does not have intact check digits", e.getMessage());
         }
     }
 

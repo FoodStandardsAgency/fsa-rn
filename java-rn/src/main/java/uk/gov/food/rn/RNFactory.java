@@ -13,7 +13,29 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-public class RNFactory  {
+public class RNFactory {
+	
+	// Add shutdown hook to attempt to clear out any held lock files.
+	// They may not delete if obtained by other processes
+	{ Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+	    @Override
+	    public void run() {
+	      for (int key : factories.keySet()) {
+		    RNFactory factory = factories.get(key);
+					
+		    if (factory.lockFile != null) {
+		      try {
+			    factory.lockFile.close();
+			    factory.lockFile.delete();
+			    factory.lockFile = null;
+			  } catch (IOException e) {
+			    // Ignore
+		  	  }
+		    }
+		  }
+	    }
+	  }));
+	}
 	
 	static private String LOCK_DIRECTORY = "/var/fsa-rn/locks";
 	
@@ -160,7 +182,7 @@ public class RNFactory  {
         }
 
     }
-
+    
     /** @@TODO Factor this main out into some JUnit tests */
 
     public static void main(String[] args) {
