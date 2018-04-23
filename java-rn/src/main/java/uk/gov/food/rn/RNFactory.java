@@ -95,7 +95,7 @@ public class RNFactory  {
 
     /**
      * Generates a fresh {@link RN}, pausing for 1ms if less than 1ms has elasped since the factory
-     * generated the immediately previous RN. This is to ensure that generated RN are unque.
+     * generated the immediately previous RN. This is to ensure that generated RN are unique.
      * 
      * At present there is NO mechanism in place to ensure that there at most one instance of factory
      * for a given {@link Authority),{@link Instance},{@link Type} combination on a given hardware platform, 
@@ -103,7 +103,7 @@ public class RNFactory  {
      * 
      * There is a need for some external mechanism to ensure for example that simple command line tools running in
      * shell scripts safely create factories. This may rely on some OS IPC mechanism, or possibly a convention for
-     * obtaining and exclusive lock on a file for the life time of the given factory object.
+     * obtaining an exclusive lock on a file for the life time of the given factory object.
      * 
      * @return a fresh unique {@link RN}
      */
@@ -131,7 +131,27 @@ public class RNFactory  {
         } catch (RNException e) {
             return null;
         }
-
+    }
+    
+    /**
+     *  Static RN generator parameterised by authority, instance and type.
+     *  Duplication of authority/instance/type combinations are avoided within
+     *  the same JVM, but duplication of authority/instance/type conbinations needs to
+     *  be managed across all installation operated for/on behalf of an authority.
+     *  
+     *  The simplest tactic is to manage the allocation of instance numbers to operational
+     *  instances of a generator.
+     *  
+     * @param authority
+     * @param instance
+     * @param type
+     * @return
+     * 
+     */
+    public static RN generateReferenceNumber(Authority authority, Instance instance, Type type) {
+    	RNFactory generator = getFactory(authority, instance, type);
+    	
+    	return generator.generateReferenceNumber();
     }
 
 //    /** @@TODO Factor this main out into some JUnit tests */
