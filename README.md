@@ -22,17 +22,18 @@ This is in the **Alpha phase** of development.  We use the alpha phase to: build
 - `Specification Version 0.1` <BR/>
 
 - The initial Java implementation ([java-rn](java-rn) - `Version 0.0.1`)
-- A Javascript implementation is planned following initial testing phase
+- Further implementations are expected following initial testing discussions
+- A JavaScript implementation to support Reference Number verification is planned following initial testing phase
 
 ### Documentation and specification
 See the [project Wiki](https://github.com/FoodStandardsAgency/fsa-rn/wiki) for the **specification** and other documentation such as context, rational and detail on the underlying methods.
+Note the [*Implementation and alpha notes*](https://github.com/FoodStandardsAgency/fsa-rn/wiki/Implementation-and-alpha-notes) for further details on the considerations to be aware of.
 
 
 ## Getting started
 - See the [specification documentation](https://github.com/FoodStandardsAgency/fsa-rn/wiki)
 - choose the code implementation (currently java-rn only)
-- further details to be added
-- note that you will need choose appropriate input parameters for the specific use
+- In implementation of the specification and code there is a need to assure that only one generator can operate with the combination of parameters: `authority`, `instance` and `type` this is may mean that direct client side browser implementations of the generator are problematic (and a server side implementation is required)
 
 
 ## Feedback
