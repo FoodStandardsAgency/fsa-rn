@@ -27,7 +27,7 @@ This is in the **Alpha phase** of development.  We use the alpha phase to: build
 
 ### Documentation and specification
 See the [project Wiki](https://github.com/FoodStandardsAgency/fsa-rn/wiki) for the **specification** and other documentation such as context, rational and detail on the underlying methods.
-Note the [*Implementation and alpha notes*](https://github.com/FoodStandardsAgency/fsa-rn/wiki/Implementation-and-alpha-notes) for further details on the considerations to be aware of.
+Note the [*Implementation and alpha notes*](https://github.com/FoodStandardsAgency/fsa-rn/wiki/Implementation-and-alpha-notes) for further details on the considerations to be aware of and this includes **known areas that may change post Alpha**
 
 
 ## Getting started
