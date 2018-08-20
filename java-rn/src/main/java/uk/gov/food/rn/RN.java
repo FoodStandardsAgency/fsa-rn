@@ -155,16 +155,17 @@ public class RN implements Comparable<RN> {
      *   - instant (as a UTC 8601 dateTime string)
      *   - version
      *
-     *   aaaa:i:tt:yyyy-MM-ddThh:mm:ss.uuuZ
+     *   aaaa:iii:ttt:yyyy-MM-ddThh:mm:ss.uuuZ:v
      *
      * @return
      */
     public String toDebugString() {
-        return String.format("%04d:%01d:%02d:%s",
+        return String.format("%03d:%03d:%03d:%s:v%01d",
                               getAuthority().getId(),
                               getInstance().getId(),
                               getType().getId(),
-                              timestamp.getInstant());
+                              timestamp.getInstant(),
+                              version.getId());
     }
 
     @Override
@@ -230,8 +231,8 @@ public class RN implements Comparable<RN> {
      * @param decimal The decimal value to be parsed.
      */
     protected void parseDecimalForm(BigInteger decimal) {
-        // uuuaaaaittyyyyMMddhhmmss
-        Pattern p = Pattern.compile("(?<u>\\d{3})(?<a>\\d{4})(?<i>\\d{1})(?<t>\\d{2})(?<y>\\d{4})(?<M>\\d{2})(?<d>\\d{2})(?<h>\\d{2})(?<m>\\d{2})(?<s>\\d{2})");
+        // uuuaaaaiiitttssssssssssv
+        Pattern p = Pattern.compile("(?<u>\\d{3})(?<a>\\d{4})(?<i>\\d{3})(?<t>\\d{3})(?<s>\\d{10})(?<v>\\d{1})");
         Matcher m = p.matcher(String.format("%024d", decimal));
         if (!m.matches()) {
             throw new RNException("Bad decimal form (incorrect length): " + decimal);
@@ -241,15 +242,14 @@ public class RN implements Comparable<RN> {
         instance  = new Instance(m.group("i"));
         authority = new Authority(m.group("a"));
 
-        int milli = Integer.parseInt(m.group("u"));
-        int sec   = Integer.parseInt(m.group("s"));
-        int min   = Integer.parseInt(m.group("m"));
-        int hour  = Integer.parseInt(m.group("h"));
-        int day   = Integer.parseInt(m.group("d"));
-        int month = Integer.parseInt(m.group("M"));
-        int year  = Integer.parseInt(m.group("y"));
+        long milli = Long.parseLong(m.group("u"));
+        long sec   = Long.parseLong(m.group("s"));
+        version = new Version(Integer.parseInt(m.group("v")));
 
-        timestamp = new TimeStamp( ZonedDateTime.of(year, month, day, hour, min, sec, milli*1000000, ZoneOffset.UTC) );
+        Instant i = Instant.ofEpochMilli(sec * 1000 + milli);
+        ZonedDateTime z = ZonedDateTime.ofInstant(i, ZoneOffset.UTC);
+
+        timestamp = new TimeStamp(z);
     }
 
     /**
@@ -257,19 +257,14 @@ public class RN implements Comparable<RN> {
      *
      * @return A single number which packs the reference number information into a single value
      */
-    protected BigInteger packElements(Authority authority, Instance instance, Type type, ZonedDateTime zdt) {
-        long year = ChronoField.YEAR.getFrom(zdt);
-        long month = ChronoField.MONTH_OF_YEAR.getFrom(zdt);
-        long day = ChronoField.DAY_OF_MONTH.getFrom(zdt);
-        long hour = ChronoField.HOUR_OF_DAY.getFrom(zdt);
-        long min = ChronoField.MINUTE_OF_HOUR.getFrom(zdt);
-        long sec = ChronoField.SECOND_OF_MINUTE.getFrom(zdt);
+    protected BigInteger packElements(Authority authority, Instance instance, Type type, ZonedDateTime zdt, Version version) {
         long milli = ChronoField.MILLI_OF_SECOND.getFrom(zdt);
+        long epoch = zdt.toEpochSecond();
 
         String decimalForm = String.format(
-                "%03d%04d%01d%02d%04d%02d%02d%02d%02d%02d",
+                "%03d%04d%03d%03d%010d%01d",
                 milli, authority.getId(), instance.getId(), type.getId(),
-                year, month, day, hour, min, sec);
+                epoch, version.getId());
 
         return new BigInteger(decimalForm);
     }

@@ -46,7 +46,7 @@ public class RNTest
      * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldConstructAnRNFromAnEncodedNumber() {
-        RN rn = new RN("H31DEZ-JCCB4T-XYPZ8S");
+        RN rn = new RN("H31DDZ-TFSV8C-KELK2B");
 
         assertEquals(1234, rn.getAuthority().getId());
         assertEquals(5, rn.getInstance().getId());
@@ -59,19 +59,19 @@ public class RNTest
     @Test
     public void itShouldEncodeAReferenceNumberToExternalForm() {
         RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
-        assertEquals("H31DEZ-JCCB4T-XYPZ8S", rn.getEncodedForm());
+        assertEquals("H31DDZ-TFSV8C-KELK2B", rn.getEncodedForm());
     }
 
     @Test
     public void itShouldGenerateAHumanReadbleFormForDebugging() {
         RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
-        assertEquals("1234:5:06:2018-04-12T12:34:51.468Z", rn.toDebugString());
+        assertEquals("1234:005:006:2018-04-12T12:34:51.468Z:v0", rn.toDebugString());
     }
 
     @Test
     public void itShouldTheTransportFormByDefault() {
         RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
-        assertEquals("H31DEZ-JCCB4T-XYPZ8S", rn.toString());
+        assertEquals("H31DDZ-TFSV8C-KELK2B", rn.toString());
     }
 
     /** Note: this test has been updated due to the choice
@@ -112,8 +112,8 @@ public class RNTest
         return ZonedDateTime.of(2018, 04, 12, 12, 34, 51, 468*1000000, ZoneOffset.UTC);
     }
 
-    /** Corresponds to 1234:5:6:20180412123451 */
+    /** Corresponds to 1234:005:006:20180412123451:0 */
     protected BigInteger internalRepresentationFixture() {
-        return new BigInteger("468123450620180412123451");
+        return new BigInteger("468123400500615235364910");
     }
 }

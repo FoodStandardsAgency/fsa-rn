@@ -87,7 +87,7 @@ public class RepresentationTest {
         RN rn = fixture();
         Representation r = new Representation(rn);
 
-        assertEquals("E057TK-HRLBQW-0PB99N", r.getEncodedForm());
+        assertEquals("JDYEGN-VD5KMR-EM7YGZ", r.getEncodedForm());
     }
 
     @Test
@@ -162,20 +162,20 @@ public class RepresentationTest {
         Representation r = new Representation(rn);
 
         String s = r.getEncodedForm();
-        String sDamaged = s.replaceAll("B", "0");
+        String sDamaged = s.replaceAll("N", "0");
 
         try {
             new Representation(sDamaged);
             fail("Should be rejected");
         }
         catch (RNException e) {
-            assertEquals("Value 'E057TK-HRL0QW-0P099N' does not have intact check digits", e.getMessage());
+            assertEquals("Value 'JDYEG0-VD5KMR-EM7YGZ' does not have intact check digits", e.getMessage());
         }
     }
 
     protected RN fixture() {
         RN rn = null;
-        long time = 1523540718283L;
+        long time = 1523540718486L;
         ZonedDateTime instant = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC);
 
         try {
