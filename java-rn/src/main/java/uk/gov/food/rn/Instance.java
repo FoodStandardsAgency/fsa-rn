@@ -20,7 +20,7 @@ package uk.gov.food.rn;
  */
 public class Instance {
     public static final int MIN_INSTANCE_ID = 0;
-    public static final int MAX_INSTANCE_ID = 9;
+    public static final int MAX_INSTANCE_ID = 999;
 
     private int id;
 

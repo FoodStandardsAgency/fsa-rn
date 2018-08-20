@@ -15,15 +15,13 @@ public class InstanceTest {
     @Test
     public void shouldAllowLegalInstanceId() {
         assertTrue("should be a legal identifier", Instance.isValidIdentifier(0));
-        assertTrue("should be a legal identifier", Instance.isValidIdentifier(5));
-        assertTrue("should be a legal identifier", Instance.isValidIdentifier(9));
+        assertTrue("should be a legal identifier", Instance.isValidIdentifier(55));
+        assertTrue("should be a legal identifier", Instance.isValidIdentifier(999));
     }
 
     @Test
     public void shouldNotAllowIllegalInstanceId() {
         assertFalse("should not be a legal identifier", Instance.isValidIdentifier(-1));
-        assertFalse("should not be a legal identifier", Instance.isValidIdentifier(10));
-        assertFalse("should not be a legal identifier", Instance.isValidIdentifier(11));
         assertFalse("should not be a legal identifier", Instance.isValidIdentifier(1000));
     }
 
@@ -40,7 +38,7 @@ public class InstanceTest {
     @Test
     public void shouldNotConstructALegalInstance() {
         try {
-            assertNotNull(new Instance(100));
+            assertNotNull(new Instance(1000));
             fail("should not be permitted");
         }
         catch (RNException e) {
@@ -60,7 +58,7 @@ public class InstanceTest {
     @Test
     public void shouldNotConstructIncorrectlyEncodedInstance() {
         try {
-            assertNotNull(new Instance("100"));
+            assertNotNull(new Instance("1000"));
             fail("should not be permitted");
         }
         catch (RNException e) {
