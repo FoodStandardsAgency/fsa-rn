@@ -18,7 +18,7 @@ package uk.gov.food.rn;
  */
 public class Type {
     public static final int MIN_TYPE_ID = 0;
-    public static final int MAX_TYPE_ID = 99;
+    public static final int MAX_TYPE_ID = 999;
 
     private int id;
 

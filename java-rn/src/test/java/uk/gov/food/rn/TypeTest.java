@@ -21,13 +21,12 @@ public class TypeTest {
         assertTrue("should be a legal identifier", Type.isValidIdentifier(0));
         assertTrue("should be a legal identifier", Type.isValidIdentifier(5));
         assertTrue("should be a legal identifier", Type.isValidIdentifier(99));
+        assertTrue("should be a legal identifier", Type.isValidIdentifier(549));
     }
 
     @Test
     public void shouldNotAllowIllegalTypeId() {
         assertFalse("should not be a legal identifier", Type.isValidIdentifier(-1));
-        assertFalse("should not be a legal identifier", Type.isValidIdentifier(100));
-        assertFalse("should not be a legal identifier", Type.isValidIdentifier(101));
         assertFalse("should not be a legal identifier", Type.isValidIdentifier(1000));
     }
 
@@ -44,7 +43,7 @@ public class TypeTest {
     @Test
     public void shouldNotConstructALegalType() {
         try {
-            assertNotNull(new Type(101));
+            assertNotNull(new Type(1001));
             fail("should not be permitted");
         }
         catch (RNException e) {
@@ -64,7 +63,7 @@ public class TypeTest {
     @Test
     public void shouldNotConstructIncorrectlyEncodedType() {
         try {
-            assertNotNull(new Type("200"));
+            assertNotNull(new Type("2000"));
             fail("should not be permitted");
         }
         catch (RNException e) {
