@@ -127,7 +127,7 @@ public class RNFactory  {
         ZonedDateTime instant = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time),ZoneOffset.UTC);
 
         try {
-            return new RN(authority, instance, type, instant);
+            return new RN(authority, instance, type, instant, new Version(0));
         } catch (RNException e) {
             return null;
         }

@@ -24,8 +24,7 @@ public class RNTest
 {
     @Test
     public void itShouldConstructAnRNFromElements() {
-        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
-
+        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
         assertEquals(1234, rn.getAuthority().getId());
         assertEquals(5, rn.getInstance().getId());
         assertEquals(6, rn.getType().getId());
@@ -39,6 +38,7 @@ public class RNTest
         assertEquals(1234, rn.getAuthority().getId());
         assertEquals(5, rn.getInstance().getId());
         assertEquals(6, rn.getType().getId());
+        assertEquals(0, rn.getVersion().getId());
         assertEquals(timestampFixture(), rn.getInstant().getInstant());
     }
 
@@ -58,19 +58,19 @@ public class RNTest
      * of alphabet ordering. See https://github.com/FoodStandardsAgency/fsa-rn/issues/5 */
     @Test
     public void itShouldEncodeAReferenceNumberToExternalForm() {
-        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
+        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
         assertEquals("H31DEZ-JCCB4T-XYPZ8S", rn.getEncodedForm());
     }
 
     @Test
     public void itShouldGenerateAHumanReadbleFormForDebugging() {
-        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
+        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
         assertEquals("1234:5:06:2018-04-12T12:34:51.468Z", rn.toDebugString());
     }
 
     @Test
     public void itShouldTheTransportFormByDefault() {
-        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
+        RN rn = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
         assertEquals("H31DEZ-JCCB4T-XYPZ8S", rn.toString());
     }
 
@@ -92,8 +92,8 @@ public class RNTest
 
     @Test
     public void itShouldDetectEquality() {
-        RN rn0 = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
-        RN rn1 = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
+        RN rn0 = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
+        RN rn1 = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
 
         assertEquals(rn0, rn1);
         assertEquals(rn0.hashCode(), rn1.hashCode());
@@ -101,8 +101,8 @@ public class RNTest
 
     @Test
     public void itShouldDetectInequality() {
-        RN rn0 = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture());
-        RN rn1 = new RN(new Authority(1243), new Instance(5), new Type(6), timestampFixture());
+        RN rn0 = new RN(new Authority(1234), new Instance(5), new Type(6), timestampFixture(), new Version(0));
+        RN rn1 = new RN(new Authority(1243), new Instance(5), new Type(6), timestampFixture(), new Version(0));
 
         assertNotEquals(rn0, rn1);
         assertNotEquals(rn0.hashCode(), rn1.hashCode());

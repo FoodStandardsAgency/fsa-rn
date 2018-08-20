@@ -5,6 +5,7 @@
 package uk.gov.food.rn;
 
 import java.math.BigInteger;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
@@ -50,6 +51,9 @@ public class RN implements Comparable<RN> {
     /** Facade class giving access to the encoded form */
     private Representation representation;
 
+    /** Version of the reference number */
+    private Version version;
+
     /**
      * Construct an RN form its constituent parts.
      *
@@ -60,12 +64,13 @@ public class RN implements Comparable<RN> {
      * @throws RNException if the dateTime indicated by instant is outside the range permitted for RNs.
      *
      */
-    public RN(Authority authority, Instance instance, Type type, ZonedDateTime instant) {
+    public RN(Authority authority, Instance instance, Type type, ZonedDateTime instant, Version version) {
         this.authority = authority;
         this.instance = instance;
         this.type = type;
+        this.version = version;
         timestamp = new TimeStamp(instant);
-        value = packElements(authority, instance, type, instant);
+        value = packElements(authority, instance, type, instant, version);
         representation = new Representation(this);
     }
 
@@ -116,6 +121,11 @@ public class RN implements Comparable<RN> {
     }
 
     /**
+     * @return the version
+     */
+    public Version getVersion() { return version; }
+
+    /**
      * @return the instant
      */
     public TimeStamp getInstant() {
@@ -143,6 +153,7 @@ public class RN implements Comparable<RN> {
      *   - instance
      *   - type
      *   - instant (as a UTC 8601 dateTime string)
+     *   - version
      *
      *   aaaa:i:tt:yyyy-MM-ddThh:mm:ss.uuuZ
      *

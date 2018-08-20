@@ -179,7 +179,7 @@ public class RepresentationTest {
         ZonedDateTime instant = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC);
 
         try {
-            rn = new RN(new Authority(1234), new Instance(5), new Type(6), instant);
+            rn = new RN(new Authority(1234), new Instance(5), new Type(6), instant, new Version(0));
         }
         catch (RNException e) {
             //
