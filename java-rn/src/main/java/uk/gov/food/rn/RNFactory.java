@@ -4,6 +4,8 @@
 ******************************************************************************/
 package uk.gov.food.rn;
 
+import org.apache.commons.collections.map.LRUMap;
+
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -16,6 +18,7 @@ public class RNFactory  {
     private final Instance  instance   ;
     private final Type      type       ;
     private long  prev = 0 ;
+    private static int MAX_FACTORY_INSTANCES = 100;
 
     /**
 	 * @return the authority
@@ -53,7 +56,7 @@ public class RNFactory  {
      *  Use a Map to ensure there is a single factory instance for each authority,instance and type combination
      *  within the same JVM.
      */
-    private static HashMap<Integer,RNFactory> factories = new HashMap<Integer,RNFactory>() ;
+    private static LRUMap factories = new LRUMap(MAX_FACTORY_INSTANCES) ;
 
     
     /**
@@ -72,7 +75,7 @@ public class RNFactory  {
 
         synchronized (factories) {
             if (factories.containsKey(res.hashCode())) {
-                res = factories.get(res.hashCode());
+                res = (RNFactory) factories.get(res.hashCode());
             } else {
                 factories.put(res.hashCode(), res);
             }
