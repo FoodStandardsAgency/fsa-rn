@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.epimorphics.fsa</groupId>
-  <artifactId>java-rn</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>uk.gov.food</groupId>
+  <artifactId>rn</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>java-rn</name>
